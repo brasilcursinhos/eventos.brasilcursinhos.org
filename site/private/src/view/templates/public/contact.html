@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+
+{% set includePublicHeader = true %}
+{% set includePublicFooter = true %}
+{% set bodyClass = "bg-drawn pt-4" %}
+
+{% block head %}
+    <title>Contato - Eventos Brasil Cursinhos</title>
+    <meta name="keywords" content="Brasil Cursinhos; Eventos; Cursinhos Universitários Populares; Educação Popular">
+    <meta name="description" content="Formulário de contato por e-mail com o Cursinho PES.">
+    <meta name="robots" content="index, follow">
+{% endblock head %}
+
+{% block main %}
+<main class="d-flex justify-content-center align-items-center pt-4">
+  <div class="card m-4 maxw-900">
+    <div class="card-body d-flex justify-content-center align-items-center minh-500">
+      {% if success == true %}
+      <section class="text-center">
+        <p class="h2">Sua mensagem foi enviada com sucesso!</p>
+        <p class="py-4">Em breve entraremos em contato com você através do endereço de e-mail fornecido.</p>
+        <div class="row g-3 justify-content-center">
+          <div class="col-auto">
+            <a class="btn btn-secondary-pes" href="/"><span class="material-symbols-outlined">arrow_back</span> <b>Voltar a página inicial</b></a>
+          </div>
+          <div class="col-auto">
+            <a class="btn btn-secondary-pes" href="/contato"><span class="material-symbols-outlined">refresh</span> <b>Enviar outra mensagem</b></a>
+          </div>
+        </div>
+      </section>
+      {% elseif success is not null and success == false %}
+      <section class="text-center">
+        <p class="h2">Houve um problema ao enviar a sua mensagem!</p>
+        <p class="py-4">Tente novamente mais tarde ou entre em contato diretamente pelo nosso e-mail.</p>
+        <div class="row g-3 justify-content-center">
+          <div class="col-auto">
+            <a class="btn btn-secondary-pes" href="/contato"><span class="material-symbols-outlined">refresh</span> <b>Tentar novamente</b></a>
+          </div>
+          <div class="col-auto">
+            <a class="btn btn-secondary-pes" href="mailto:contato@pes.ufsc.br">    <span class="material-symbols-outlined">forward_to_inbox</span> <b>Enviar e-mail</b>    </a>
+          </div>
+        </div>
+      </section>
+      {% else %}
+      <section id="contact-form" class="w-100 px-3">
+        <h1>Contato</h1>
+        <p>Tem alguma dúvida? Fala para a gente!</p>
+        <form action="" method="post" id="message-form">
+          {{ csrf_field() }}
+          <div class="mb-3 row">
+            <label for="name" class="col-auto col-form-label pe-3 fw-medium">Nome:</label>
+            <div class="col">
+              <input type="text" class="form-control" id="name" name="name" placeholder="Digite seu nome completo" required>
+            </div>
+          </div>
+          <div class="mb-3 row">
+            <label for="email" class="col-auto col-form-label pe-3 fw-medium">E-mail:</label>
+            <div class="col">
+              <input type="email" class="form-control" id="email" name="email" placeholder="Digite o seu endereço de e-mail" required>
+            </div>
+          </div>
+          <div class="mb-3 row g-3">
+            <label for="email" class="col-auto col-form-label fw-medium">Assunto:</label>
+            <div class="col">
+              <select class="form-select text-secondary" id="subject" name="subject" required>
+                <option value="" selected>Selecione o assunto...</option>
+                <option value="1" class="text-dark">Dúvidas</option>
+                <option value="2" class="text-dark">Sugestões</option>
+                <option value="8" class="text-dark">Processos Seletivos</option>
+                <option value="4" class="text-dark">Doações ou parcerias</option>
+                <option value="3" class="text-dark">Reclamações ou elogios</option>
+                <option value="7" class="text-dark">Suporte Técnico (site)</option>
+                <option value="5" class="text-dark">Relatório de dados pessoais (LGPD)</option>
+                <option value="6" class="text-dark">Exclusão de dados pessoais (LGPD)</option>
+                <option value="9" class="text-dark">Outros assuntos</option>
+              </select>
+            </div>
+          </div>
+          <div class="mb-3 row g-3 d-none" id="selection-infos">
+            <div class="col row mt-3">
+              <label for="email" class="col-auto col-form-label fw-medium">Tipo:</label>
+              <div class="col">
+                <select name="type-selection" id="type-selection" class="form-select text-secondary">
+                  <option value="" selected>Selecione o tipo de processo seletivo...</option>
+                  <option value="| Alunos" class="text-dark">de Alunos</option>
+                  <option value="| Gestores" class="text-dark">de Gestores</option>
+                  <option value="| Professores" class="text-dark">de Professores</option>
+                </select>
+              </div>
+            </div>
+            <div class="col row mt-3">
+              <label for="email" class="col-auto col-form-label fw-medium">Nº Inscrição:</label>
+              <div class="col">
+                <input type="text" name="registration-number" id="registration-number" class="form-control" placeholder="(Apenas para inscritos)">
+              </div>
+            </div>
+          </div>
+          <div class="mb-3">
+            <label for="email" class="form-label fw-medium">Digite a sua mensagem:</label>
+            <textarea name="message" id="message" rows="4" class="form-control" required></textarea>
+          </div>
+          <div class="w-100 text-center">
+            <button class="btn btn-secondary-pes w-25" id="btn-send-message"><b>Enviar</b> <span class="material-symbols-outlined">send</span></button>
+          </div>
+        </form>
+      </section>
+      <section id="sending-message" class="d-none">
+        <div class="loading-message text-center">
+          <div class="h2">
+            <div class="spinner-border" role="status"></div>
+            Enviando mensagem...
+          </div>
+          <div class="h4">Aguarde!</div>
+        </div>
+      </section>
+    {% endif %}
+    </div>
+  </div>
+</main>
+{% endblock main %}
+
+{% block scriptsJS %}
+{% include '@links/forms-validation.html' %}
+<script src="/assets/js/pages/contact.js" defer></script>
+{% endblock scriptsJS %}

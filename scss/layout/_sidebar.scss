@@ -1,0 +1,65 @@
+@use '../abstracts/index' as *;
+
+.sidebar {
+  padding: 0;
+  height: 100%;
+  max-width: 90%;
+  border-right: 3px solid $primary-color-bc;
+  
+  &::-webkit-scrollbar {
+    display: block;
+    width: 8px;
+  }
+    
+  &:hover::-webkit-scrollbar {
+    width: 8px;
+    display: block;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    background: transparent;
+  }
+  
+  &:hover::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    background: rgb(255, 255, 255);
+  }
+  
+  &::-webkit-scrollbar-thumb:hover {
+    background: rgb(163, 163, 163);
+  }
+}
+
+.main-content {
+  height: 100%;
+  padding: 0;
+}
+
+.buttons-list {
+  padding-left: 0;
+  
+  & ul {
+    padding-left: 0;
+  }
+  
+  & li {
+    list-style-type: none;
+  }
+}
+
+.buttons-list li > button {
+  display: inline-flex;
+  align-items: center;
+}
+
+.buttons-list li > button::before {
+  line-height: 0;
+  content: url("data:image/svg+xml,%0A%3Csvg xmlns='http://www.w3.org/2000/svg' height='24px' viewBox='0 0 24 24' width='24px' fill='%23FFFFFF'%3E%3Cpath d='M0 0h24v24H0V0z' fill='none'/%3E%3Cpath d='M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6-6-6z'/%3E%3C/svg%3E");
+}
+
+

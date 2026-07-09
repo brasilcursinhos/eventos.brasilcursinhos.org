@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% set includeRestrictedHeader = true %}
+{% set includePublicFooter = false %}
+{% set headerUser = 'Administrador' %}
+{% set headerLink = '/administrador'%}
+
+{% block head %}
+<title>Administração - Cursinho PES</title>
+<meta name="keywords" content="Cursinho PES; UFSC; Curso pré-vestibular; Projeto Educação Solidária; Araranguá">
+<meta name="description" content="Página com informações sobre o Processo Seletivo de {{department | title}} do Cursinho PES.">
+<meta name="robots" content="index, follow">
+{% block head2 %}{% endblock head2 %}
+{% endblock head %}
+
+{% block main %}
+<div class="page-content container-fluid">
+  <button class="btn btn-secondary-pes btn-expand-sidebar d-block d-md-none collapsed" data-bs-target="#sidebar" data-bs-toggle="collapse"></button>
+  <div class="row h-100" >
+    <aside class="col-md-3 col-lg-3 col-xl-20 d-md-block overflow-y bg-drawn collapse collapse-horizontal sidebar" id="sidebar">
+      <div class="ms-1 px-5 px-md-3 mb-4" >
+        <h5 class="w-100 text-white mt-3">Opções:</h5>
+        {% for link in links %}
+          <a class="btn btn-secondary-pes w-100 mt-2" href="{{link.url}}">{{link.name}}</a>
+        {% endfor %}
+      </div>
+    </aside>
+    <div class="col-md-9 ms-sm-auto col-lg-9 col-xl-80 main-content d-flex flex-column overflow-y">
+      <main>
+        <div id="php-info-shadow-container"></div>
+      </main>
+    </div>
+  </div>
+</div>
+{% endblock main %}
+
+{% block scriptsJS %}
+    <script>
+    const host = document.querySelector('#php-info-shadow-container');
+    const shadow = host.attachShadow({ mode: 'open' });
+    const phpInfoTemplate = `
+    <style>
+        {{ css|raw }}
+
+        .php-info-wrapper {
+            background-color: #333333;
+            color: #e2e4ef;
+            font-family: sans-serif;
+            padding: 1rem 3rem;
+        }
+
+        td {border-color: #505153}
+        .h {background-color: #4F5B93}
+
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            margin-top: 10px;
+        }
+    </style>
+    <div class="php-info-wrapper">
+        {{ content|raw }}
+    </div>
+`;
+    shadow.innerHTML = phpInfoTemplate;
+</script>
+{% endblock scriptsJS %}
+

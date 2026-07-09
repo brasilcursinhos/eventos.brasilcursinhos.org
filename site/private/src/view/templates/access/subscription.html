@@ -1,0 +1,365 @@
+{% extends "base.html" %}
+
+{% set includePublicHeader = false %}
+{% set includePublicFooter = false %}
+{% set bodyClass = "bg-drawn pt-4" %}
+
+{% block head %}
+    <title>Inscrição - Aulões de Revisão UFSC - Cursinho PES</title>
+    <meta name="keywords" content="Cursinho PES; UFSC; Curso pré-vestibular; Projeto Educação Solidária; Araranguá">
+    <meta name="description" content="Formulário de inscrição para os Aulões de Revisão para o UFSC oferecidos pelo Cursinho Projeto Educação Solidária.">
+    <meta name="robots" content="index, follow">
+{% endblock head %}
+
+{% block main %}
+<main class="d-flex justify-content-center align-items-center pt-4">
+  <div class="card m-4 maxw-1000">
+    <div class="card-body w-100">
+      <h1 class="mb-4 fw-bold text-center">Ficha de Inscrição - Aulões UFSC 2026</h1>
+      <form action="/eventos/auloes-ufsc/inscricao" method="post" id="registration-form">
+        <div class="card">
+          <div class="card-header">
+            <h5 class="card-title fw-bold mb-0">INFORMAÇÕES PESSOAIS</h5>
+          </div>
+          <div class="card-body">
+            <div class="card mb-3">
+              <div class=" card-header">
+                <strong>IDENTIFICAÇÃO E TRATAMENTO</strong>
+              </div>
+              <div class="card-body">
+                <div class="row g-2 mb-1">
+                  <div class="col-md">
+                    <label for="first-name" class="form-label"><b>Nome:</b></label>
+                    <input type="text" class="form-control" id="first-name" name="first-name" placeholder="Digite o seu nome" autocomplete="given-name">
+                  </div>
+                  <div class="col-md">
+                    <label for="last-name" class="form-label"><b>Sobrenome:</b></label>
+                    <input type="text" class="form-control" id="last-name" name="last-name" placeholder="Digite o seu sobrenome" autocomplete="family-name">
+                  </div>
+                </div>
+                <small><strong>ATENÇÃO:</strong> Informe o seu nome e sobrenome <strong>completos</strong> de acordo como constam em seus documentos oficiais.</small>
+                <div class="row my-4">
+                  <div class="col">
+                    Gostaria de utilizar nome social?&nbsp;&nbsp;&nbsp;
+                    <div class="form-check form-check-inline">
+                      <input class="form-check-input" type="radio" name="use-social-name" id="use-social-name-yes" value="yes">
+                      <label class="form-check-label" for="use-social-name-yes">Sim</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                      <input class="form-check-input" type="radio" name="use-social-name" id="use-social-name-no" value="no" checked>
+                      <label class="form-check-label" for="use-social-name-no">Não</label>
+                    </div>
+                  </div>
+                </div>
+                <div class="card my-4 d-none" id="social-name-field">
+                  <div class="card-header">
+                    <strong>NOME SOCIAL</strong>
+                  </div>
+                  <div class="card-body">
+                    <div class="row mb-3">
+                      <div class="col">
+                        <label for="last-name" class="form-label"><b>Nome social:</b></label>
+                        <input type="text" class="form-control" id="social-name" name="social-name" placeholder="Digite o seu nome social">
+                      </div>
+                    </div>
+                    <p class="mb-0"><strong>IMPORTANTE:</strong> Seu nome civil será mantido em sigilo e utilizado apenas quando for estritamente necessário, como na emissão de documentos oficiais. Mesmo nestes casos, seu nome social sempre aparecerá em posição de destaque.</p>
+                  </div>
+                </div>
+                <div class="row g-2">
+                  <div class="col-md-4">
+                    <label for="cpf" class="form-label"><b>CPF:</b></label>
+                    <input type="text" class="form-control is-valid" id="cpf" value="{{"%s.%s.%s-%s"|format(cpf[0:3], cpf[3:3], cpf[6:3], cpf[9:])}}" readonly disabled>
+                    <input type="text" name="cpf" value="{{cpf}}" hidden>
+                  </div>
+                  <div class="col-md-4">
+                    <label for="birth-date" class="form-label"><b>Data de Nascimento:</b></label>
+                    <input type="date" class="form-control" id="birth-date" name="birth-date" min="1900-01-01" max="{{ "now" | date('Y-m-d')}}">
+                  </div>
+                  <div class="col-md-4">
+                    <label for="pronouns" class="form-label"><b>Pronomes:</b></label>
+                    <select name="pronouns" id="pronouns" class="form-select">
+                      <option value="">Selecione...</option>
+                      <option value="Ela/dela">Ela/dela</option>
+                      <option value="Ele/dele">Ele/dele</option>
+                      <option value="Elu/delu">Elu/delu</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="card mb-3">
+              <div class="card-header">
+                <strong>INFORMAÇÕES DE CONTATO</strong>
+              </div>
+              <div class="card-body">
+                <div class="row g-2 mb-3">
+                  <div class="col-md-8">
+                    <label for="email" class="form-label"><b>E-mail:</b></label>
+                    <input type="text" class="form-control is-valid" id="email" value="{{email}}" autocomplete="off" readonly disabled>
+                    <input type="text" class="form-control is-valid" name="email" value="{{email}}" autocomplete="off" hidden>
+                  </div>
+                  <div class="col-md-4">
+                    <label for="phone" class="form-label"><b>Telefone:</b></label> <small>(WhatsApp)</small>
+                    <input type="text" class="form-control" id="phone" name="phone" placeholder="(__) _____-____" autocomplete="tel-national">
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="card" id="emergency-contact-fields">
+              <div class="card-header">
+                <strong>CONTATO DE EMERGÊNCIA</strong>
+              </div>
+              <div class="card-body">
+                <p class="mb-2">Neste campo você deve indicar um contato de algum familiar ou colega, maior de idade, para o caso de emergências. caso você seja menor de idade, deve indicar obrigatoriamente indicar o contato do responsável legal!</p>
+                <div class="row g-2 mb-3">
+                  <div class="col-md-5">
+                    <label for="emergency-contact-name" class="form-label"><b>Nome completo do contato:</b></label>
+                    <input type="text" class="form-control" id="emergency-contact-name" name="emergency-contact-name">
+                  </div>
+                  <div class="col-md-3">
+                    <label for="emergency-contact-kinship" class="form-label"><b>Parentesco:</b></label>
+                    <select name="emergency-contact-kinship" id="emergency-contact-kinship" class="form-select">
+                      <option value="">Selecione...</option>
+                      <option value="Pai/mãe">Pai/mãe</option>
+                      <option value="Avô/Avó">Avô/Avó</option>
+                      <option value="Tio/Tia">Tio/Tia</option>
+                      <option value="Irmão/Irmã">Irmão/Irmã</option>
+                      <option value="Esposo/Esposa">Esposo/Esposa</option>
+                      <option value="Filho/Filha">Filho/Filha</option>
+                      <option value="Outro">Outro</option>
+                    </select>
+                  </div>
+                  <div class="col-md-4">
+                    <label for="emergency-contact-phone" class="form-label"><b>Telefone do contato:</b></label>
+                    <input type="text" class="form-control" id="emergency-contact-phone" name="emergency-contact-phone" placeholder="(__) _____-____">
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-12">
+                    <label for="health-conditions" class="form-label">Caso você possua alguma alergia, faça uso de algum medicamento contínuo e/ou possua alguma outra condição de saúde relevante pode descrever aqui:</label>
+                    <textarea class="form-control" id="health-conditions" name="health-conditions" rows="3" placeholder="Preenchimento opicional"></textarea>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+        <div class="card my-3" id="school-informations">
+          <div class="card-header">
+            <h5 class="card-title fw-bold mb-0">INFORMAÇÕES ESCOLARES</h5>
+          </div>
+          <div class="card-body">
+            <div class="row mb-3">
+              <div class="col">
+                Atualmente:&nbsp;&nbsp;&nbsp;
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="radio" name="student-type" id="student-type-studying" value="student" checked>
+                  <label class="form-check-label" for="student-type-studying">Estou cursando o ensino médio</label>
+                </div>
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="radio" name="student-type" id="student-type-formed" value="formed">
+                  <label class="form-check-label" for="student-type-formed">Já concluí o ensino médio</label>
+                </div>
+              </div>
+            </div>
+            <div class="row mb-3 g-2">
+              <div class="col-sm-12 col-lg-5">
+                <label for="school-name-select" class="form-label" id="school-name-label"><b>Nome da escola:</b></label>
+                <select name="school-name" id="school-name-select" class="form-select">
+                  <option value="">Selecione...</option>
+                  <option value="E.E.B. Apolônio Ireno Cardoso">E.E.B Apolonio Ireno Cardoso</option>
+                  <option value="E.E.B. Araranguá">E.E.B. Araranguá</option>
+                  <option value="E.E.B. Bernardino Sena Campos">E.E.B. Bernardino Sena Campos</option>
+                  <option value="E.E.B. Manoel Gomes Baltazar">E.E.B. Manoel Gomes Baltazar</option>
+                  <option value="E.E.B. Profª Dolvina Leite de Medeiros">E.E.B Profª Dolvina Leite de Medeiros</option>
+                  <option value="E.E.B. Profª Maria Garcia Pessi">E.E.B. Profª Maria Garcia Pessi</option>
+                  <option value="E.E.B. Profª Neussa Ostetto Cardoso">E.E.B. Profª Neussa Ostetto Cardoso</option>
+                  <option value="IFSC - Campus Araranguá">IFSC - Araranguá</option>
+                  <option value="Outra">Outra Escola</option>
+                </select>
+                <div class="input-group mb-3 d-none" id="school-name-text-field">
+                  <input class="form-control" type="text" id="school-name-text" name="school-name" disabled placeholder="Digite o nome da escola">
+                  <button class="input-group-text" id="btn-back-school-name-select" aria-label="Voltar a lista" title="Voltar a lista"><span class="material-symbols-outlined" role="img" aria-hidden="true">arrow_back</span> <small>Voltar a lista</small></button>
+                </div>
+              </div>
+              <div class="col-sm-8 col-lg-5">
+                <label for="school-city" class="form-label"><b>Cidade:</b></label>
+                <input class="form-control" type="text" id="school-city" name="school-city" placeholder="Digite a cidade da sua escola">
+              </div>
+              <div class="col-sm-4 col-lg-2">
+                <label for="school-uf" class="form-label"><b>UF:</b></label>
+                <select name="school-uf" id="school-uf" class="form-select">
+                  <option value="">Selecione...</option>
+                  
+                </select>
+              </div>
+              <small>Preencha com as informações da escola que você estuda atualmente ou na qual você concluíu o ensino médio.</small>
+            </div>
+            <div id="studying-fields">
+              <div class="row mb-3 g-2">
+                <div class="col-sm-6 col-lg-3">
+                  <label for="school-grade" class="form-label"><b>Série:</b></label>
+                  <select name="school-grade" id="school-grade" class="form-select">
+                    <option value="">Selecione...</option>
+                    <option value="1º">1º ano</option>
+                    <option value="2º">2º ano</option>
+                    <option value="3º">3º ano</option>
+                  </select>
+                </div>
+                <div class="col-sm-6 col-lg-3">
+                  <label for="school-class" class="form-label"><b>Turma:</b></label>
+                  <input class="form-control" type="text" id="school-class" name="school-class">
+                </div>
+                <div class="col-sm-6 col-lg-3">
+                  <label for="school-shift" class="form-label"><b>Turno:</b></label>
+                  <select name="school-shift" id="school-shift" class="form-select">
+                    <option value="">Selecione...</option>
+                    <option value="Matutino">Matutino</option>
+                    <option value="Vespertino">Vespertino</option>
+                    <option value="Noturno">Noturno</option>
+                    <option value="Integral">Integral</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            <div id="formed-fields" class="d-none">
+              <div class="row g-2 mb-3">
+                <div class="col-sm-6 col-lg-3">
+                  <label for="school-conclusion-year" class="form-label"><b>Ano de Conclusão:</b></label>
+                  <input class="form-control" type="number" id="school-conclusion-year" name="school-conclusion-year" min="1900" max="{{'now' |date('Y')}}">
+                </div>
+              </div>
+            </div>
+            <hr>
+            <div class="row g-2">
+              <label for="school-type" class="col-auto col-form-label me-2">Em qual tipo de escola você cursa/cursou o ensino médio?</label>
+              <select name="school-type" id="school-type" class="col-12 col-xl form-select">
+                <option value="" selected>Selecione...</option>
+                <option value="Inteiramente em escola pública">Inteiramente em escola pública</option>
+                <option value="Inteiramente em escola particular (com bolsa)">Inteiramente em escola particular (com bolsa)</option>
+                <option value="Inteiramente em escola particular (sem bolsa)">Inteiramente em escola particular (sem bolsa)</option>
+                <option value="Parte em escola pública e parte em escola particular (com bolsa)">Parte em escola pública e parte em escola particular (com bolsa)</option>
+                <option value="Parte em escola pública e parte em escola particular (sem bolsa)">Parte em escola pública e parte em escola particular (sem bolsa)</option>
+                <option value="Parte em escola particular (sem bolsa) e parte em escola particular (com bolsa)">Parte em escola particular (sem bolsa) e parte em escola particular (com bolsa)</option>
+              </select>
+            </div>
+            <hr>
+            <div class="row">
+              <div class="col">
+                Você já fez o UFSC alguma vez?&nbsp;&nbsp;&nbsp;
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="radio" name="has-taken-exam" id="has-taken-exam-yes" value="yes">
+                  <label class="form-check-label" for="has-taken-exam-yes">Sim</label>
+                </div>
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="radio" name="has-taken-exam" id="has-taken-exam-no" value="no" checked>
+                  <label class="form-check-label" for="has-taken-exam-no">Não</label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card my-3">
+          <div class="card-header">
+            <h5 class="card-title fw-bold mb-0">INSCRIÇÕES PARA OS AULÕES</h5>
+          </div>
+          <div class="card-body">
+            <p class="mb-2"><strong>IMPORTANTE:</strong></p>
+            <ul>
+              <li>Você deve indicar em quais dias irá participar dos aulões.</li>
+              <li>Você poderá participar dos aulões <strong>apenas</strong> nos dias em que estiver previamente inscrito.</li>
+              <li>Você pode voltar ao site e editar a sua inscrição a qualquer momento, alterando os dias nos quais está inscrito.</li>
+              <li>Você pode cancelar a inscrição, ou se inscrever, em um dia de aulão <strong>até 1 hora antes</strong> do início do respectivo aulão.</li>
+              <li>Caso você falte em dois dias de aulão para o qual esteja inscrito sem justificativa válida, <strong>sua inscrição será cancelada</strong> nos demais dias em que estever inscrito e você perderá a sua vaga, não podendo participar dos demais dias de aulão.</li>
+            </ul>
+            <p class="fw-bold fs-5 ms-2">Selecione os dias em que você participará dos aulões:</p>
+            <div class="row g-3 mt-3 days-form-container">
+              {% for i in range(0, 1) %}
+              <div class="col-md-6">
+                <div class="card row g-3 mx-0 mx-md-2 my-2 my-md-0 bg-body-tertiary">
+                <p class="mb-0 fs-5 ms-2"><strong>SEMANA 0{{i+1}}</strong></p>
+                {% for j in range(0, 4) %}
+                  {% if (schedule[5*i+j].startDate|date('Y/m/d H:i') < "now"|date('Y/m/d H:i') or (schedule[5*i+j].vacancies <= 0)) %}
+                  <div class="col-12 ms-2{{(j == 4)? " mb-3"}}">
+                    <div class="form-check d-flex align-items-center">
+                      <input type="checkbox" name="registration-day-{{schedule[5*i+j].day}}" hidden>
+                      <input type="checkbox" name="registration-day-{{schedule[5*i+j].day}}" id="registration-day-{{schedule[5*i+j].day}}" class="form-check-input day-checkbox me-2" disabled>
+                      <label for="registration-day-{{schedule[5*i+j].day}}" class="form-check-label"><strong>DIA {{schedule[5*i+j].day}} - {{schedule[5*i+j].startDate|date('d/m')}}:</strong> <br>{{schedule[5*i+j].schedule}}</label>
+                    </div>
+                  </div>
+                  {% else %}
+                  <div class="col-12 ms-2{{(j == 4)? " mb-3"}}">
+                    <div class="form-check d-flex align-items-center">
+                      <input type="checkbox" name="registration-day-{{schedule[5*i+j].day}}" id="registration-day-{{schedule[5*i+j].day}}" class="form-check-input day-checkbox me-2">
+                      <label for="registration-day-{{schedule[5*i+j].day}}" class="form-check-label"><strong>DIA {{schedule[5*i+j].day}}:</strong> {{schedule[5*i+j].startDate|date('d')}} de novembro às 19h <br><strong>TEMA:</strong> {{schedule[5*i+j].schedule}}</label>
+                    </div>
+                  </div>
+                  {% endif %}
+                {% endfor %}
+                </div>
+              </div>
+              {% endfor %}
+              <div class="col-12" id="days-error-container"></div>
+            </div>
+          </div>
+        </div>
+        <div class="card my-3 d-none">
+          <div class="card-header">
+            <h5 class="card-title mb-0 fw-bold">SENHA DE ACESSO</h5>
+          </div>
+          <div class="card-body">
+            <p class="mb-1">Crie uma senha para acessar sistema e acompanhar ou editar a sua inscrição posteriormente.</p>
+            <p>A senha deve ter no mínimo 8 caracteres, sendo pelo menos 1 letra minúscula, 1 letra maiúscula e 1 número.</p>
+            <div class="row g-2 mb-1">
+              <div class="col-md">
+                <label for="first-name" class="form-label"><b>Senha:</b></label>
+                <input type="password" class="form-control" id="password" name="password" autocomplete="new-password">
+              </div>
+              <div class="col-md">
+                <label for="last-name" class="form-label"><b>Confirme sua senha:</b></label>
+                <input type="password" class="form-control" id="password-confirmation" name="password-confirmation" autocomplete="new-password">
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card my-3">
+          <div class="card-header">
+            <h5 class="card-title fw-bold mb-0">TERMOS DE INSCRIÇÃO, TRATAMENTO DE DADOS E USO DE IMAGEM</h5>
+          </div>
+          <div class="card-body">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" value="" name="declaration-of-reading" id="declaration-of-reading">
+              <label class="form-check-label" for="declaration-of-reading">
+                Declaro que li, compreendi e estou de acordo com os termos de inscrição e particição nos Aulões de Revisão UFSC 2026.
+              </label>
+            </div>
+            <div class="form-check mt-3">
+              <input class="form-check-input" type="checkbox" value="" name="lgpd-authorization" id="lgpd-authorization">
+              <label class="form-check-label" for="lgpd-authorization">
+                Autorizo o Cursinho PES a coletar, tratar e armazenar meus dados pessoais fornecidos na inscrição e durante as atividades dos Aulões de Revisão UFSC 2026, enquanto durar meu vínculo, conforme a Política de Tratamento de Dados Pessoais e em conformidade com a Lei nº 13.709/2018 (LGPD).
+              </label>
+            </div>
+            <div class="form-check mt-3">
+              <input class="form-check-input" type="checkbox" value="" name="image-usage-authorization" id="image-usage-authorization">
+              <label class="form-check-label" for="image-usage-authorization">
+                Autorizo o Cursinho PES a utilizar minha imagem e voz, coletadas nos Aulões de Revisão UFSC 2026, em qualquer material de divulgação, incluindo redes sociais, cartazes, site, folhetos e transmissões ao vivo no YouTube, em todo território nacional e internacional, por prazo indeterminado, sem qualquer compensação ou direito de reclamação.
+              </label>
+            </div>
+          </div>
+        </div>
+        <div class="w-100 text-center">
+          <a href="/eventos/auloes-enem" class="btn btn-primary-pes"><strong><span class="material-symbols-outlined">cancel</span> CANCELAR</strong></a>
+          <button class="btn btn-secondary-pes" type="submit"><b><span class="material-symbols-outlined">save</span> INSCREVER</b></button>
+        </div>
+      </form>
+    </div>
+  </div>
+</main>
+{% endblock main %}
+
+{% block scriptsJS %}
+    {% include '@links/forms-validation.html' %}
+    <script src="/assets/js/pages/review-classes-subscriptions.js?v=1.01" defer></script>
+{% endblock scriptsJS %}
+

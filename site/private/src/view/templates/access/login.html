@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% set bodyClass = 'bg-drawn' %}
+
+{% block head %}
+        <title>Login - Eventos Brasil Cursinhos</title>
+        <meta name="keywords" content="Brasil Cursinhos; Eventos; Cursinhos Universitários Populares; Educação Popular">
+        <meta name="description" content="Página de Login para a área restrita do site de gerenciamaneto de eventos da Brasil Cursinhos.">
+        <meta name="robots" content="index, follow">
+{% endblock head %}
+
+{% block main %}
+<main class="bg-drawn d-flex justify-content-center align-items-center">
+  <div class="card m-4 maxw-900">
+    <div class="card-body">
+      <div class="row minh-400">
+        <div class="col-12 col-sm-6 d-flex flex-column justify-content-center">
+          <img src="/assets/img/logos/logo-bc.png" class="w-75 mx-auto" alt="Logo Brasil Cursinhos">
+        </div>
+        <div class="col-12 col-sm-6 d-flex flex-column justify-content-center">
+          <form action="/login" method="post" id="login-form">
+            {{ csrf_field() }}
+            <h4 class="card-title mb-2 w-100 text-center">Seja bem-vindo!</h4>
+            <h6 class="card-subtitle mb-3 text-muted w-100 text-center">Realize o login para continuar</h6>
+            <div class="row mb-3">
+              <div class="col-12">
+                <label for="cpf"><b>CPF:</b></label>
+                <input type="text" class="form-control{{(errorMessage is not null)? ' is-invalid'}}" name="cpf" id="cpf" placeholder="Digite o seu CPF">
+                {% if errorMessage is not null %}
+                <label for="cpf" class="invalid-feedback">{{errorMessage}}</label>
+                {% endif %}
+              </div>
+            </div>
+            <div class="row mb-1">
+              <div class="col-12">
+                <label for="password"><b>Senha:</b></label>
+                <div class="input-group">
+                  <input type="password" class="form-control" name="password" id="password" placeholder="Digite a sua senha">
+                  <button type="button" class="input-group-text" id="btn-password-visibility" aria-label="Mostrar senha" title="Mostrar senha"><span class="material-symbols-outlined" role="img" aria-hidden="true">visibility</span></button>
+                </div>
+              </div>
+            </div>
+            <div class="row mb-3">
+              <div class="col text-end">
+                <a href="/recuperar-conta"><small>Esqueceu a senha ou primeiro acesso?</small></a>
+              </div>
+            </div>
+            <div class="row mb-4 g-3">
+              <div class="col">
+                <a href="/" class="btn btn-cancel-bc w-100 text-decoration-none"><span class="material-symbols-outlined">arrow_back</span> <b>Voltar</b></a>
+              </div>
+              <div class="col">
+                <button type="submit" class="btn btn-secondary-bc w-100"><b>Entrar</b> <span class="material-symbols-outlined">login</span></button>
+              </div>
+            </div>
+            <div class="row mb-0">
+              <div class="col text-center">
+                <p class="mb-0">Não possuí uma conta? <a href="/cadastro" class="text-nowrap"><strong>Cadastre-se!</strong></a></p>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+<footer class="w-100 text-white text-center">
+  <p class="my-2"><b>{{ "now" | date('Y')}} Brasil Cursinhos ©</b></p>
+</footer>
+{% endblock main %}
+
+{% block scriptsJS %}
+{% include '@links/forms-validation.html' %}
+<script src="/assets/js/pages/login.js" defer></script>
+{% endblock scriptsJS %}

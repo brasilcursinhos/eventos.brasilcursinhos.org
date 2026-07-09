@@ -1,0 +1,4 @@
+User-agent: *
+Disallow:
+
+Sitemap: https://eventos.brasilcursinhos.org/sitemap.xml

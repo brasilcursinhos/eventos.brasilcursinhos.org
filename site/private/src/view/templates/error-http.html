@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% set mainClass = 'container text-center mt-5' %}
+
+{% block head %}
+        <title>Erro {{code}} - Brasil Cursinhos</title>
+        <meta name="keywords" content="Brasil Cursinhos; Eventos; Cursinhos Universitários Populares; Educação Popular">
+        <meta name="description" content="Página de erro.">
+        <meta name="robots" content="none">
+{% endblock head %}
+
+{% block main %}
+<main class="d-flex align-items-center">
+  <div class="w-100 text-center container-lg">
+    <h1 class="mb-5 fs-1">Erro {{code}} - {{name}}</h1>
+    {% if description != '' %}
+            <p class="fs-4 mb-5">{{description}}</p>
+{% endif %}
+{% if code == '401'%}
+            <p class='fs-4'>Você pode <a href='/login'><b>realizar login</b></a> ou <a href='/'><b>voltar a página inicial</b></a>.</p>
+{% elseif code == '403' %}
+            <p class="fs-4"><a href='/login'><b>Voltar a página inicial</b></a>.</p>
+{% else %}
+            <p class="fs-4"><a href='/'><b>Voltar a página inicial</b></a>.</p>
+{% endif %}
+  </div>
+</main>
+{% endblock main %}

@@ -1,0 +1,68 @@
+@use '../abstracts/index' as *;
+
+.bg-secondary-color-bc {
+  background-color: $secondary-color-bc;
+}
+
+.bg-primary-color-bc {
+  background-color: $primary-color-bc;
+}
+
+.bg-encup-primary {
+  background-color: $encup-primary-color;
+}
+
+.bg-encup-online {
+  background-color: rgb(107, 207, 244);
+}
+
+.bg-encup-secondary {
+  background-color: $encup-secondary-color;
+}
+
+.bg-encup-tertiary {
+  background-color: $encup-tertiary-color;
+}
+
+
+.bg-drawn{
+  background: url("/assets/img/bg-draws-25.png") repeat;
+  background-color: $primary-color-bc;
+  background-size: 250px auto;
+}
+
+.form-check-input {
+
+  &:focus {
+    border-color: $border-color;
+    box-shadow: 0 0 0 0.25rem $shadow-color;
+  }
+
+  &:checked {
+    background-color: $link-color;
+    border-color: $link-color;
+  }
+}
+
+.form-select:focus {
+  border-color: $border-color;
+  box-shadow: 0 0 0 0.25rem $shadow-color;
+}
+
+.form-control:focus {
+  border-color: $border-color;
+  box-shadow: 0 0 0 0.25rem $shadow-color;
+}
+
+.accordion-button:focus {
+  border-color: $border-color;
+  box-shadow: 0 0 0 0.25rem $shadow-color;
+}
+
+.bg-primary-bc {
+  background-color: $primary-color-bc !important;
+}
+
+.bg-secondary-bc {
+  background-color: $secondary-color-bc !important;
+}

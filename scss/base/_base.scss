@@ -1,0 +1,119 @@
+@use '../abstracts/index' as *;
+
+html {
+  height: 100%;
+}
+
+body {
+  height: 100%;
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+main, .main {
+  flex: 1;
+}
+
+.page-content { 
+  padding-top: 60px;
+  box-sizing: border-box;
+  flex: 1;
+}
+
+.overflow-y {
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+}
+
+.icon-links a {
+  color: #f2f2f2;
+  text-decoration: none;
+
+  &:hover {
+    color: rgb(200, 200, 200);
+    text-decoration: none !important;
+  }
+}
+
+a {
+  color: $link-color;
+  text-decoration: none;
+
+  &:hover{
+    color: $link-hover-color;
+  }
+}
+
+main a:hover {
+  text-decoration: underline;
+}
+
+.maxw-1200 {
+  width: 100%;
+  max-width: 1200px;
+}
+
+.maxw-1100 {
+  width: 100%;
+  max-width: 1100px;
+}
+
+.maxw-1000 {
+  width: 100%;
+  max-width: 1000px;
+}
+
+.maxw-900 {
+  width: 100%;
+  max-width: 900px;
+}
+
+.maxw-800 {
+  width: 100%;
+  max-width: 800px;
+}
+
+.maxw-700 {
+  width: 100%;
+  max-width: 700px;
+}
+
+.maxw-600 {
+  width: 100%;
+  max-width: 600px;
+}
+
+.maxw-500 {
+  width: 100%;
+  max-width: 500px;
+}
+
+.maxw-90 {
+  width: 100%;
+  max-width: 90px;
+}
+
+.minw-250 {
+  min-width: 250px;
+}
+
+.minh-400 {
+  min-height: 400px;
+}
+
+.minh-500 {
+  min-height: 500px;
+}
+
+.minh-600 {
+  min-height: 600px;
+}
+
+.minh-700 {
+  min-height: 700px;
+}
+
+.minh-800 {
+  min-height: 800px;
+}

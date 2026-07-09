@@ -1,0 +1,8 @@
+{% extends "restricted/admin/base.html" %}
+
+{% block main2 %}
+    <h2 class="mt-3 mb-4">Area do administrador</h2>
+    <p class="mb-2">Olá, {{user.nickname}}!</p>
+    <p>Selecione a opção desejada ao lado.</p>
+    <p><strong>PERFIL DE ACESSO: </strong>{{user.roles|map(role => role.label)|join(' | ')}}</p>
+{% endblock main2 %}

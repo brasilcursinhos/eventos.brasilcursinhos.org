@@ -1,0 +1,31 @@
+.footer {
+  background-color: black;
+  color: white;
+  width: 100%;
+  text-align: center;
+  z-index:1000;
+}
+
+.footer-col-left {
+  width: auto;
+}
+
+.footer-col-right {
+  width: auto;
+}
+
+.fs-footer {font-size: 0.9rem;}
+
+@media (min-width: 475px) {
+  .fs-footer {
+    font-size: 1rem;
+  }
+
+  .footer-col-left {
+    width: 420px;
+  }
+
+  .footer-col-right {
+    width: 324px;
+  }
+}

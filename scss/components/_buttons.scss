@@ -1,0 +1,80 @@
+.btn-cancel-bc{
+  background-color: #b5102e !important;
+  color: #f2f2f2 !important;
+
+  &:hover{
+    background-color: #9c0e28 !important;
+    color: #f2f2f2 !important;
+  }
+
+  &:focus, .btn.focus {
+    outline: 0;
+    box-shadow: 0 0 0 0.2rem #bf6071 !important;
+  }
+
+  &:disabled, .disabled {
+    opacity: 0.85 !important;
+  }
+}
+
+.btn-primary-bc{
+  background-color: rgb(5, 49, 65);
+  color: #f2f2f2;
+
+  &:hover{
+    background-color: rgb(4, 37, 49) !important;
+    color: #f2f2f2 !important;
+  }
+
+  &:focus, .btn.focus {
+    outline: 0 !important;
+    box-shadow: 0 0 0 0.2rem rgb(70, 130, 152) !important;
+  }
+
+  &:disabled, .disabled {
+    opacity: 0.85 !important;
+  }
+}
+
+.btn-secondary-bc{
+  background-color: rgb(15, 144, 144) !important;
+  color: #f2f2f2 !important;
+
+  &:hover{
+    background-color: rgb(5, 116, 116) !important;
+    color: #f2f2f2 !important;
+  }
+
+  &:focus, .btn.focus {
+    outline: 0 !important;
+    box-shadow: 0 0 0 0.2rem rgb(100, 208, 208) !important;
+  }
+
+  &:disabled, .disabled {
+    opacity: 0.85 !important;
+  }
+}
+
+.btn-expand-sidebar {
+
+  @extend .btn-secondary-bc;
+
+  width: 32px;
+  height: 38px;
+  position: fixed;
+  top: 50%;
+  left: 0;
+  
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' height='24px' viewBox='0 0 24 24' width='24px' fill='%23FFFFFF'%3E%3Cpath d='M0 0h24v24H0V0z' fill='none' opacity='.87'/%3E%3Cpath d='M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6-6-6z'/%3E%3C/svg%3E");
+  background-position: center;
+  background-repeat: no-repeat;
+  transition: left 0.35s ease;
+}
+
+.btn-expand-sidebar:not(.collapsed) {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' height='24px' viewBox='0 0 24 24' width='24px' fill='%23FFFFFF'%3E%3Cpath d='M0 0h24v24H0V0z' fill='none' opacity='.87'/%3E%3Cpath d='M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12l4.58-4.59z'/%3E%3C/svg%3E");
+  position: fixed;
+  top: 50%;
+  left: 90%;
+  transition: left 0.35s ease;
+}

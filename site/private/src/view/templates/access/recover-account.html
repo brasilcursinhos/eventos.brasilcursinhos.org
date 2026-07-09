@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% set bodyClass = 'bg-drawn' %}
+
+{% block head %}
+<title>Recuperar Conta - Brasil Cursinhos</title>
+<meta name="keywords" content="Brasil Cursinhos; Eventos; Cursinhos Universitários Populares; Educação Popular">
+<meta name="description" content="Página de recuperação de conta para acesso a área restrita do site do Cursinho PES, curso pré-vestibular social da UFSC Campus Araranguá-SC.">
+<meta name="robots" content="index, follow">
+{% endblock head %}
+
+{% block main %}
+<main class="d-flex justify-content-center align-items-center">
+  <div class="card m-4 maxw-900">
+    <div class="card-body">
+      <div class="row">
+        <div class="col-12 col-sm-6 d-flex flex-column justify-content-center">
+          <img src="/assets/img/logos/logo-bc.png" class="w-75 mx-auto" alt="Logo Brasil Cursinhos">
+        </div>
+        <div class="col-12 col-sm-6 d-flex flex-column justify-content-center">
+          <h4 class="card-title mb-4 w-100 text-center fw-bold">RECUPERAÇÃO DE CONTA</h4>
+          {% if email is not null %}
+          <p class="mb-2 text-muted w-100 text-center">Foi enviado um e-mail para <strong>{{ (email|split('@'))[0]|slice(0, 5) ~ '*******@' ~ (email|split('@'))[1] }}</strong> com as instruções para a redefinição de senha.</p>
+          <p class="mb-4 text-muted w-100 text-center">O link tem validade de 30 minutos. Verifique sua caixa de spam caso não tenha recebido nenhuma mensagem, ou entre em contato com o suporte caso acredite que o seu endereço de e-mail esteja incorreto.</p>
+          <div class="row mb-3 g-3">
+            <div class="col">
+              <a href="/login" class="btn btn-primary-pes w-100 text-decoration-none"><span class="material-symbols-outlined">arrow_back</span> <b>Voltar</b></a>
+            </div>
+            <div class="col">
+              <a href="/contato" class="btn btn-secondary-pes w-100 text-decoration-none"><b>Entrar em contato</b> <span class="material-symbols-outlined">send</span></a>
+            </div>
+          </div>
+          {% else %}
+          <h6 class="card-subtitle mb-3 text-muted w-100 text-center">Informe o seu CPF. As instruções de redefinição de senha serão encaminhadas para o seu endereço de e-mail.</h6>
+          <form action="/recuperar-conta" method="post">
+            {{ csrf_field() }}
+            <div class="row mb-4">
+              <div class="col-12">
+                <label for="cpf"><b>CPF:</b></label>
+                <input type="text" class="form-control{{errorMessage? ' is-invalid':''}}" name="cpf" id="cpf" placeholder="___.___.___-__">
+                <label for="cpf" class="invalid-feedback">{{errorMessage}}</label>
+              </div>
+            </div>
+            <div class="row mb-3 g-3">
+              <div class="col">
+                <a href="/login" class="btn btn-cancel-bc w-100 text-decoration-none"><span class="material-symbols-outlined">arrow_back</span> <b>Voltar</b></a>
+              </div>
+              <div class="col">
+                <button class="btn btn-secondary-bc w-100"><b>Enviar</b> <span class="material-symbols-outlined">send</span></button>
+              </div>
+            </div>
+          </form>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+<footer class="w-100 text-white text-center">
+  <p class="my-2"><b>{{ "now" | date('Y')}} Brasil Cursinhos ©</b></p>
+</footer>
+{% endblock main %}
+
+{% block scriptsJS %}
+{% include '@links/forms-validation.html' %}
+<script src="/assets/js/pages/login.js" defer></script>
+{% endblock scriptsJS %}

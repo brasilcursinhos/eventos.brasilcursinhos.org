@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% set mainClass = 'container text-center mt-5' %}
+
+{% block head %}
+        <title>{{title}} - Brasil Cursinhos</title>
+        <meta name="keywords" content="Brasil Cursinhos; Eventos; Cursinhos Universitários Populares; Educação Popular">
+        <meta name="description" content="Página de links para as subpáginas da sessão {{title}}">
+        <meta name="robots" content="index, follow">
+{% endblock head %}
+
+{% block main %}
+<main class="container-fluid d-flex align-items-center">
+    <div class="w-100 text-center">
+        <h1 class="mb-5">{{title}} - Brasil Cursinhos</h1>
+        <p class="fs-4 mb-4">Selecione a página que você gostaria de acessar:</p>
+    {% for link in links %}
+        <p class="mb-2"><a href="{{link.url}}" class="fs-4">{{link.name}}</a></p>
+    {% endfor %}
+        <p class='fs-4 mt-4'><a href="/"><b>Voltar a página inicial</b></a></p>
+    </div>
+</main>               
+{% endblock main %}

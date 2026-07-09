@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% set bodyClass = 'bg-drawn' %}
+
+{% block head %}
+<title>Politica de Privacidade - Cursinho PES (Aplicativo)</title>
+<meta name="keywords" content="Cursinho PES; UFSC; Curso pré-vestibular; Projeto Educação Solidária; Araranguá">
+<meta name="description" content="Política de privacidade do aplicativo Cursinho PES.">
+<meta name="robots" content="index, follow">
+{% endblock head %}
+
+{% block main %}
+<main class="d-flex justify-content-center align-items-center">
+  <div class="card m-3 m-md-5  maxw-900">
+    <div class="card-body px-3 px-md-5 text-justify">
+      <h1 class="text-center py-4">Política de Privacidade – Cursinho PES</h1>
+
+      <p><strong>Data de vigência:</strong> 20 de maio de 2025.</p>
+
+      <p>O aplicativo <strong>Cursinho PES</strong> respeita a sua privacidade e está comprometido em proteger os dados dos usuários. Esta Política de Privacidade explica como as informações são tratadas no uso do nosso aplicativo.</p>
+
+      <h2>1. Coleta de Informações</h2>
+      <p>O <strong>Cursinho PES</strong> não coleta, armazena nem compartilha dados pessoais sensíveis dos usuários, como nome, e-mail, localização ou informações de contato.</p>
+      <p>Podemos coletar <strong>dados de uso anônimos</strong>, como estatísticas gerais de acesso e navegação no app, para melhorar a experiência do usuário. Esses dados não identificam o usuário individualmente.</p>
+
+      <h2>2. Uso das Informações</h2>
+      <p>As informações coletadas de forma automática (como dados de uso) são utilizadas exclusivamente para:</p>
+      <ul>
+          <li>Melhorar o desempenho e a qualidade do app;</li>
+          <li>Corrigir erros;</li>
+          <li>Entender padrões de uso e preferências gerais dos usuários.</li>
+      </ul>
+
+      <h2>3. Compartilhamento de Informações</h2>
+      <p>Não compartilhamos nenhuma informação pessoal com terceiros. Podemos usar serviços de terceiros (como o Google Analytics for Firebase) apenas para análise anônima de uso, seguindo todas as exigências de privacidade da Google.</p>
+
+      <h2>4. Segurança</h2>
+      <p>Adotamos medidas técnicas para proteger os dados coletados contra acessos não autorizados. No entanto, lembre-se de que nenhum sistema é 100% seguro.</p>
+
+      <h2>5. Crianças</h2>
+      <p>O <strong>Cursinho PES</strong> é voltado a estudantes do ensino médio e pré-vestibular. Não coletamos intencionalmente dados pessoais de crianças menores de 13 anos. Se tomarmos conhecimento de que dados foram coletados indevidamente, tomaremos medidas para excluí-los imediatamente.</p>
+
+      <h2>6. Alterações nesta Política</h2>
+      <p>Podemos atualizar esta Política de Privacidade periodicamente. Notificaremos sobre mudanças significativas dentro do app ou nesta página.</p>
+
+      <h2>7. Contato</h2>
+      <p>Se você tiver dúvidas ou preocupações sobre esta Política de Privacidade, entre em contato conosco pelo e-mail: <strong>lgpd@pes.ufsc.br</strong>.</p>
+
+    </div>
+  </div>
+</main>
+<footer class="w-100 text-white text-center">
+  <p class="my-2"><b>{{ "now" | date('Y')}} Cursinho PES ©</b></p>
+</footer>
+{% endblock main %}
+
+{% block scriptsJS %}
+{% include '@links/forms-validation.html' %}
+<script src="/assets/js/pages/login.js" defer></script>
+{% endblock scriptsJS %}

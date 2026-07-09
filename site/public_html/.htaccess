@@ -1,0 +1,133 @@
+AddDefaultCharset UTF-8
+
+<IfModule mod_rewrite.c>
+    
+    RewriteEngine On
+
+    # Redireciona o www para o domínio principal
+    RewriteCond %{HTTP_HOST} ^www.eventos.brasilcursinhos.org$
+    RewriteRule ^(.*)$ https://eventos.brasilcursinhos.org/$1 [L,R=301]
+
+    # Redirecionamento para HTTPS em ambiente com proxy reverso
+    RewriteCond %{HTTP:X-Forwarded-Proto} !^$
+    RewriteCond %{HTTP:X-Forwarded-Proto} !=https
+    RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+    # Redirecionamento para HTTPS em ambiente sem proxy reverso
+    RewriteCond %{HTTP:X-Forwarded-Proto} ^$
+    RewriteCond %{HTTPS} off
+    RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+    #URL amigaveis
+    RewriteBase /
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^([A-Za-z0-9\\\/\-]+)$ index.php?uri=$1 [QSA,L]
+
+</IfModule>
+
+<IfModule mod_headers.c>
+    # Cabeçalhos de segurança globais
+    Header always set Strict-Transport-Security "max-age=63072000; includeSubDomains; preload"
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+    Header always set Permissions-Policy "geolocation=(), microphone=(), camera=(), payment=(), usb=(), interest-cohort=()"
+    Header always set Cross-Origin-Embedder-Policy "require-corp"
+    Header always set Cross-Origin-Opener-Policy "same-origin"
+    Header always set Cross-Origin-Resource-Policy "same-origin"
+    Header always set X-Frame-Options "DENY"
+    Header always set X-Permitted-Cross-Domain-Policies "none"
+
+    # Exceção para imagens destinadas a sites externos
+    <If "%{REQUEST_URI} =~ m#^/assets/img/externo/#">
+        Header always set Cross-Origin-Resource-Policy "cross-origin"
+        Header always set Access-Control-Allow-Origin "*"
+    </If>
+
+    # Configuração Específica para arquivos estáticos
+    <FilesMatch "\.(css|js|woff2|woff|otf|ttf|jpg|jpeg|png|gif|svg|webp|avif|ico)$">
+        Header set Cache-Control "public, max-age=31536000, immutable"
+        Header unset Set-Cookie
+        Header unset X-Powered-By
+    </FilesMatch>
+
+    # Configuração Específica para PDF
+    <FilesMatch "\.pdf$">
+        Header set Cache-Control "public, max-age=31536000, immutable"
+        Header set Content-Security-Policy "frame-ancestors 'none'"
+        Header unset Set-Cookie
+        Header unset X-Powered-By
+    </FilesMatch>
+
+    # Correção de CORS para Fontes
+    <FilesMatch "\.(ttf|ttc|otf|eot|woff|woff2)$">
+        SetEnvIf Origin "^https://(eventos\.brasilcursinhos\.org|localhost)$" ALLOWED_ORIGIN=$0
+        Header set Access-Control-Allow-Origin %{ALLOWED_ORIGIN}e env=ALLOWED_ORIGIN
+        Header add Vary "Origin"
+        Header unset Set-Cookie
+        Header unset X-Powered-By
+    </FilesMatch>
+</IfModule>
+
+<IfModule mod_deflate.c>
+    # Linguagens Web Padrão
+    AddOutputFilterByType DEFLATE text/html
+    AddOutputFilterByType DEFLATE text/css
+    AddOutputFilterByType DEFLATE text/javascript
+    AddOutputFilterByType DEFLATE text/plain
+    AddOutputFilterByType DEFLATE text/xml
+    
+    # JSON e PWA
+    AddOutputFilterByType DEFLATE application/json
+    AddOutputFilterByType DEFLATE application/ld+json
+    AddOutputFilterByType DEFLATE application/manifest+json
+    AddOutputFilterByType DEFLATE application/vnd.api+json
+    
+    # Scripts e Aplicações
+    AddOutputFilterByType DEFLATE application/javascript
+    AddOutputFilterByType DEFLATE application/x-javascript
+    AddOutputFilterByType DEFLATE application/xml
+    AddOutputFilterByType DEFLATE application/xhtml+xml
+    AddOutputFilterByType DEFLATE application/rss+xml
+    
+    # Imagens Vetoriais e Ícones
+    AddOutputFilterByType DEFLATE image/svg+xml
+    AddOutputFilterByType DEFLATE image/x-icon
+    
+    # Fontes Legadas
+    AddOutputFilterByType DEFLATE application/vnd.ms-fontobject
+    AddOutputFilterByType DEFLATE application/x-font
+    AddOutputFilterByType DEFLATE application/x-font-opentype
+    AddOutputFilterByType DEFLATE application/x-font-otf
+    AddOutputFilterByType DEFLATE application/x-font-truetype
+    AddOutputFilterByType DEFLATE application/x-font-ttf
+    AddOutputFilterByType DEFLATE font/opentype
+    AddOutputFilterByType DEFLATE font/otf
+    AddOutputFilterByType DEFLATE font/ttf
+</IfModule>
+
+# Redirecionamento das mensagens de erro
+ErrorDocument 400 /erro/400
+ErrorDocument 401 /erro/401
+ErrorDocument 402 /erro/402
+ErrorDocument 403 /erro/403
+ErrorDocument 404 /erro/404
+ErrorDocument 405 /erro/405
+ErrorDocument 406 /erro/406
+ErrorDocument 407 /erro/407
+ErrorDocument 408 /erro/408
+ErrorDocument 409 /erro/409
+ErrorDocument 410 /erro/410
+ErrorDocument 411 /erro/411
+ErrorDocument 412 /erro/412
+ErrorDocument 413 /erro/413
+ErrorDocument 414 /erro/414
+ErrorDocument 415 /erro/415
+ErrorDocument 416 /erro/416
+ErrorDocument 417 /erro/417
+ErrorDocument 500 /erro/500
+ErrorDocument 501 /erro/501
+ErrorDocument 502 /erro/502
+ErrorDocument 503 /erro/503
+ErrorDocument 504 /erro/504
+ErrorDocument 505 /erro/505

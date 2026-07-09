@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="pt-BR" id="html">
+  <head>
+    {% if constant('PRODUCTION_MODE') == false %}
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-VJ8CCHJPYX"></script>
+    <script async src="/assets/js/google-analytics.js" crossorigin="anonymous"></script>
+    {% endif %}
+{%  block head %}{% endblock head %}
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#053141">
+    <meta name="copyright" content="{{ 'now' | date('Y')}} Brasil Cursinhos ©">
+    <meta name="author" content="Roger Eliodoro Condras">
+    <meta name="creator" content="Roger Eliodoro Condras">
+    <meta name="publisher" content="Roger Eliodoro Condras">
+    <meta name="rating" content="general">
+    <!-- Icone guia navegador -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <!-- Folhas de estilo CSS -->
+    <link rel="preload" href="/assets/font/MaterialSymbolsOutlined.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="/assets/font/bootstrap-icons.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="/assets/font/logo-brasilcursinhos.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="/assets/css/libs/bootstrap.min.css" as="style">
+    <link rel="stylesheet" href="/assets/css/libs/bootstrap.min.css">
+    <link rel="preload" href="/assets/css/main.css?version=1.0.0" as="style">
+    <link rel="stylesheet" href="/assets/css/main.css?version=1.0.0">
+  </head>
+    
+  <body{{ bodyClass ? " class=\"#{bodyClass}\"" | raw}}>
+
+{%      if includePublicHeader == true %}
+{%          include '@components/public-header.html' %}
+{%      elseif includeRestrictedHeader == true %}
+{%          include '@components/restricted-header.html' %}
+{%      endif %}
+
+{%      block main %}{% endblock main %}
+
+{%      if includePublicFooter == true %}
+{%          include '@components/public-footer.html' %}
+{%      elseif includeRestrictedFooter == true %}
+{%          include '@components/restricted-footer.html' %}
+{%      endif %}
+    <!-- Javascript -->
+    <script src="/assets/js/libs/bootstrap.bundle.min.js?version=5.3.8" defer></script>
+    <script src="/assets/js/libs/jquery.min.js?version=3.7.1" defer></script>
+    <script src="/assets/js/libs/jquery.mobile.custom.min.js" defer></script>
+    <script src="/assets/js/default.js" defer></script>
+{%  block scriptsJS %}{% endblock scriptsJS %}
+  </body>
+</html>

@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% set mainClass = 'container text-center mt-5' %}
+
+{% block head %}
+        <title>{{title}} - Brasil Cursinhos</title>
+        <meta name="keywords" content="Brasil Cursinhos; Eventos; Cursinhos Universitários Populares; Educação Popular">
+        <meta name="description" content="Essa página está em construção e ficará disponível em breve.">
+        <meta name="robots" content="index">
+{% endblock head %}
+
+{% block main %}
+<main class="container-fluid d-flex align-items-center">
+    <div class="w-100 text-center">
+        <h1 class="mb-5 fs-1">{{title}}</h1>
+        <p class="fs-2 fw-semibold">
+            <span class="material-symbols-outlined fs-2 align-text-bottom" aria-hidden="true">construction</span>
+             Página em construção! 
+            <span class="material-symbols-outlined fs-2 align-text-bottom" aria-hidden="true">construction</span>
+        </p>
+        <p class="fs-4 my-4">A página <b>{{title}}</b> está em construção e ficará disponível em breve.</p>
+        <p class='fs-4'><a href="/"><b>Voltar a página inicial</b></a>.</p>
+    </div>
+    
+</main>        
+            
+{% endblock main %}

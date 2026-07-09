@@ -1,0 +1,20 @@
+<header><!--Barra de navegação-->
+    <nav class="navbar navbar-expand-lg fixed-top navbar-dark bg-primary-color-bc">
+      <div class="container-fluid">
+        <a href="{{headerLink}}"><img src="/assets/img/logos/bc-branco.png" width="40" height="40" alt="Brasil Cursinhos"></a><a href="{{headerLink}}"><b class="ps-2 font-pes fs-3 navbar-brand p-0 me-auto lh-1">{{headerUser}}</b></a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar-options" aria-controls="navbar-options" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbar-options">
+          <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+              <form action="/logout" method="post">
+                {{ csrf_field() }}
+                <button type="submit" class="btn btn-cancel-bc ms-0 ms-lg-3"><b>Logout </b><span class="material-icons-outlined">logout</span></button>
+              </form>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+  </header><!--/Barra de navegação-->

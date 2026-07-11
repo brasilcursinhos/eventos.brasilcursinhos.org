@@ -1,6 +1,6 @@
 <?php
 
-use App\Enum\UserRole;
+use App\Enum\Role\UserRole;
 
 return function(\Router\Router $router)
 {

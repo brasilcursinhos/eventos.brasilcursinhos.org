@@ -1,5 +1,5 @@
 $(function(){
-    let form = $("form").validate({
+    let form = $("#login-form").validate({
         rules : {
             "password":{required: true, minlength: 8, maxlength: 20},
             "cpf":{required: true, cpfBR: true}
@@ -26,6 +26,7 @@ $(function(){
         }
     });
     $("#cpf").mask("999.999.999-99", {autoclear: false});
+    $("#cpf-registration").mask("999.999.999-99", {autoclear: false});
     $("#password").on('keydown', function(){
         if($("#passwordValidated").val() === "true") {
             form.element("#password");
@@ -49,6 +50,47 @@ $(function(){
             $("#btn-password-visibility").prop("title", "Mostrar senha");
             $("#btn-password-visibility").attr("aria-label", "Mostrar senha");
         }
+    });
+
+    $("#initial-registration-form").validate({
+        rules : {
+            "cpf-registration":{required: true, cpfBR: true},
+            "email":{required: true, email:true},
+            "email2":{required: true, email:true, equalTo: "#email"},
+        },
+        messages:{
+            "cpf-registration":{
+                required:"É obrigatório informar o seu CPF.",
+                cpfBR:"O número de CPF informado é inválido."
+            },
+            "email":{
+                required:"Informe o seu endereço de e-mail.",
+                email:"Informe um endereço de e-mail válido."
+            },
+            "email2":{
+                required:"Confirme o seu endereço de e-mail.",
+                email:"Informe um endereço de e-mail válido.",
+                equalTo:"Os endereços informados não coincidem."
+            }
+        },
+        errorClass: "invalid-feedback",
+        highlight: function(element, errorClass, validClass) {
+            $(element).addClass("is-invalid").removeClass("is-valid");
+        },
+        unhighlight: function(element, errorClass, validClass) {
+            $(element).removeClass("is-invalid").addClass("is-valid");
+        },
+    });
+
+    $("#cpf").mask("999.999.999-99", {autoclear: false});
+
+    $("#btn-start-registration").on("click tap", function(){
+        $("#initial-registration-form").submit();
+    });
+
+    $(".btn-cancel").on("click tap", function(){
+        $("input").removeClass("is-valid is-invalid").val("");
+        $(".invalid-feedback").remove();
     });
     
 })

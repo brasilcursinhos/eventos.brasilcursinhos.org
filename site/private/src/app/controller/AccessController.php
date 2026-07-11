@@ -1,14 +1,17 @@
 <?php 
 namespace App\Controller;
 
-use App\Enum\AuthResult;
-use App\Enum\UserStatus;
+use App\Enum\Result\AuthResult;
+use App\Enum\Status\SystemStatus;
+use App\Enum\Status\UserStatus;
 use App\Repository\AccessRepository;
+use App\Service\ErrorService;
 use App\Service\ValidatorService;
 use Router\Response;
 use App\Util\Auth;
 use App\Util\Email;
 use App\Util\Session;
+use MongoDB\BSON\ObjectId;
 use Router\Request;
 
 class AccessController {
@@ -121,6 +124,7 @@ class AccessController {
         } else {
             $data = [];
         }
+    
         return Response::html('@access/reset-password.html', $data)->withoutCache();
     }
 
@@ -162,6 +166,97 @@ class AccessController {
         $errorMessage = Session::getFlash('errorMessage');
         
         return Response::html('@access/subscription.html', ['success' => $success, 'errorMessage' => $errorMessage]);
+    }
+
+    public function checkRegistrationExistence(Request $request): Response 
+    {
+        $cpf = ValidatorService::validateCpf($request->__get('cpf-registration'));
+        $email = ValidatorService::validateEmail($request->__get('email'));
+        $email2 = ValidatorService::validateEmail($request->__get('email2'));
+
+        if($cpf && $email && $email2 && $email === $email2) {
+
+            if($this->repository->isRegistred($cpf)) {
+                return Response::html('@access/errors/registration-existence.html');
+            }
+
+            Session::set('cpf', $cpf);
+            Session::set('email', $email);
+
+            return Response::redirect("/cadastrar", 303);
+
+        } else {
+            throw new \UnexpectedValueException();
+        }
+    }
+
+    public function showSubscriptionForm(): Response
+    {
+        $cpf = Session::get('cpf');
+        $email = Session::get('email');
+
+        if(is_null($cpf) || is_null($email)) {
+            $description = ErrorService::getErrorHttpDescription(403);
+            return Response::html('error-http.html', $description);
+        }
+
+        return Response::html('@access/subscription.html', [
+            'cpf' => $cpf,
+            'email' => $email
+        ]);
+    }
+
+    public function saveRegistration(Request $request, ValidatorService $validator): Response
+    {
+        Session::delete('cpf');
+        Session::delete('email');
+
+        try {
+            $personalData = $validator->validatePersonalData($request->all());
+        } catch (\Exception $exception) {
+            throw new \UnexpectedValueException();
+        }
+
+        try {
+            $userId = $this->repository->saveRegistrationn($personalData);
+        } catch (\Exception $exception) {
+            throw new \UnexpectedValueException();
+        }
+
+        $code = Auth::getRandomCode(64);
+        if($this->repository->insertVerificationCode($code, $userId)) {
+
+            try {
+
+                $email = Email::create();
+                
+                $email->subject('Recuperação de conta - Cursinho PES');
+                $email->replyTo('suporte@brasilcursinhos.org', 'Suporte - rasil Cursinhos');
+                $email->to($personalData->email, $personalData->nickname);
+                $email->renderBody('recover-account.html', [
+                    'name' => $personalData->nickname,
+                    'code' => $code
+                ]);
+                
+                if(!$email->send()) {
+                    Session::flash('errorMessage', "Erro ao enviar e-mail de confirmação!");
+                }
+            } catch(\Exception $exception) {
+                Session::flash('errorMessage', "Erro ao enviar e-mail de confirmação!");
+            }
+
+            Session::flash('email', $personalData->email);
+
+        } else {
+            Session::flash('errorMessage', "Erro ao gravar o código de verificação no banco de dados!");
+        }
+
+        return Response::redirect("/cadastrar/sucesso", 303);
+    }
+
+    public function showSuccessRegistrationPage(): Response
+    {
+        return Response::html('@access/success.html');
     }
     
     // exibe a página de login

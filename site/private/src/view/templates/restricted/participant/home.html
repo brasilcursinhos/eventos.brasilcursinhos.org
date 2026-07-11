@@ -1,0 +1,20 @@
+{% extends "restricted/participant/base.html" %}
+
+{% block main2 %}
+    <h2 class="mt-3 mb-4">Área do participante</h2>
+    <p class="mb-2">Olá, {{user.nickname}}!</p>
+    <p>Confira abaixo os eventos com inscrições disponíveis:</p>
+    <div class="card w-100 w-lg-50">
+        <div class="card-header">
+            <h4 class="fw-bold mb-0">ENCUP 2026</h4>
+        </div>
+        <div class="card-body">
+            <p class="mb-1"><strong>Quando?</strong> dias 15 e 16 de agosto de 2026.</p> 
+            <p class="mb-1"><strong>Local?</strong> FGV EAESP - São Paulo/SP</p>
+            <p><strong>Valores?</strong> Ingresso 1 dia R$55,00 e Ingresso 2 dias R$ 75,00</p>
+        </div>
+        <div class="card-footer text-center">
+            <a href="https://forms.gle/GaZKF4rR4W3m5dRZ6" target="_blank" class="btn btn-secondary-bc text-decoration-none"><strong>Realizar inscrição</strong></a>
+        </div>
+    </div>
+{% endblock main2 %}

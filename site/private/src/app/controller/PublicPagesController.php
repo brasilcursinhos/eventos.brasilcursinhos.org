@@ -26,7 +26,7 @@ class PublicPagesController {
         return Response::html('@public/homepage.html');
     }
 
-    public function showErrorPage($code): Response
+    public function showErrorPage(string $code): Response
     {
         $params = ErrorService::getErrorHttpDescription($code);
         return Response::html('error-http.html', $params);
@@ -35,6 +35,11 @@ class PublicPagesController {
     public function showPrivacyPolicyPage(): Response
     {   
         return Response::html('@public/privacy-policy.html');
+    }
+
+    public function showServiceTermsPage(): Response
+    {   
+        return Response::html('@public/service-terms.html');
     }
 
     public function showAppPrivacyPolicyPage(): Response

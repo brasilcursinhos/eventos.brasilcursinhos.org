@@ -7,19 +7,21 @@ use DateTimeImmutable;
 class PersonalData
 {
     public function __construct(
-        public readonly string $firstName,
-        public readonly string $lastName,
+        public readonly string $fullName,
+        public readonly bool $useSocialName,
         public readonly string $nickname,
-        public readonly string $pronouns,
-        public readonly string $gender,
+        public readonly array $pronouns,
+        public readonly string $genderIdentity,
+        public readonly string $ethnicity,
         public readonly string $cpf,
         public readonly DateTimeImmutable $birthDate,
         public readonly string $email,
         public readonly string $phone,
         public readonly ?string $socialName = null,
-        public readonly ?IdCard $idCard = null,
-        public readonly ?EmergencyInfo $emergencyInfo = null,
         public readonly ?Address $address = null,
-        public readonly ?BankAccount $bankAccount = null,
-    ) {}
+    ) {
+        if (empty($this->pronouns)) {
+            throw new \InvalidArgumentException('O array de pronomes não pode estar vazio.');
+        }
+    }
 }

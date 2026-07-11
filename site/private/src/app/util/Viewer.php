@@ -1,8 +1,7 @@
 <?php 
 namespace App\Util;
 
-use Twig;
-use App\Enum\UserRole;
+use App\Enum\Role\UserRole;
 
 class Viewer {
 
@@ -17,10 +16,12 @@ class Viewer {
             $loader = new \Twig\Loader\FilesystemLoader(DIR_TEMPLATES);
             $loader->addPath(DIR_TEMPLATES.'access/', 'access');
             $loader->addPath(DIR_TEMPLATES.'components/', 'components');
+            $loader->addPath(DIR_TEMPLATES.'events/', 'events');
             $loader->addPath(DIR_TEMPLATES.'links/', 'links');
             $loader->addPath(DIR_TEMPLATES.'public/', 'public');
             $loader->addPath(DIR_TEMPLATES.'restricted/', 'restricted');
             $loader->addPath(DIR_TEMPLATES.'restricted/admin/', 'admin');
+            $loader->addPath(DIR_TEMPLATES.'restricted/participant/', 'participant');
             if(PRODUCTION_MODE) {
                 $cache = [
                     'cache' => DIR_TEMPLATES . 'cache',
@@ -51,11 +52,8 @@ class Viewer {
             self::$viewer->addFunction($roleFunction);
             self::$viewer->addGlobal('ROLES', [
                 'ADMIN' => UserRole::ADMINSTRATOR,
-                'STUDENT_CANDIDATE' => UserRole::STUDENT_CANDIDATE,
-                'TEACHER' => UserRole::TEACHER,
-                'MANAGER' => UserRole::MANAGER,
-                'STUDENT' => UserRole::STUDENT,
-                'HR_MANAGER' => UserRole::HR_MANAGER
+                'BC_MEMBER' => UserRole::BC_MEMBER,
+                'EVENT_PARTICIPANT' => UserRole::EVENT_PARTICIPANT
             ]);
         }
         return self::$viewer;

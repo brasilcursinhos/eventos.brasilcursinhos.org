@@ -55,10 +55,55 @@
             </div>
             <div class="row mb-0">
               <div class="col text-center">
-                <p class="mb-0">Não possuí uma conta? <a href="/cadastro" class="text-nowrap"><strong>Cadastre-se!</strong></a></p>
+                <p class="mb-0 align-center">Não possuí uma conta? <button type="button" class="btn px-2" data-bs-toggle="modal" data-bs-target="#initial-registration" id="btn-modal-initial-registration">
+              <b>Cadastre-se!</b>
+            </button></p>
               </div>
             </div>
           </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal fade" id="initial-registration" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="initial-registration-label" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header bg-primary-bc">
+          <h5 class="modal-title text-white" id="initial-registration-label">REALIZAR CADASTRO</h5>
+          <button type="button" class="btn-close btn-close-white btn-cancel" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form action="/cadastro" method="post" id="initial-registration-form">
+            {{ csrf_field() }}
+            <p>Preencha as informações abaixo para começar a inscrição.</p>
+            <div class="row mb-3">
+              <div class="col">
+                <label for="cpf-registration" class="form-label"><b>CPF:</b></label>
+                <input type="text" name="cpf-registration" id="cpf-registration" class="form-control{{(error is not empty)? ((error.cpfError)? " is-invalid":" is-valid")}}" value="{{error.cpf}}" placeholder="___.___.___-__">
+                <label for="cpf" class="invalid-feedback">O CPF informado é inválido!</label>
+              </div>
+            </div>
+            <div class="row mb-3">
+              <div class="col">
+                <label for="email" class="form-label"><b>E-mail:</b></label>
+                <input type="text" name="email" id="email" class="form-control {{(error is not empty)? ((error.emailError)? " is-invalid":" is-valid")}}" value="{{error.email}}" autocomplete="email">
+                <label for="email" class="invalid-feedback">O endereço de e-mail informado é inválido!</label>
+              </div>
+            </div>
+            <div class="row mb-3">
+              <div class="col">
+                <label for="email2" class="form-label"><b>Confirme o seu e-mail:</b></label>
+                <input type="text" name="email2" id="email2" class="form-control {{(error is not empty)? ((error.email2Error)? " is-invalid":" is-valid")}}" value="{{error.email2}}">
+                <label for="email" class="invalid-feedback">Os endereços de e-mail informados não coincidem!</label>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer bg-primary-bc">
+          <div class="w-100 text-center">
+            <button type="button" class="btn btn-cancel-bc col-4 btn-cancel" data-bs-dismiss="modal">Cancelar</button>
+            <button type="button" class="btn btn-secondary-bc col-4" id="btn-start-registration">Iniciar Inscrição</button>
+          </div>
         </div>
       </div>
     </div>

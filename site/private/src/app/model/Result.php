@@ -1,7 +1,7 @@
 <?php 
 namespace App\Model;
 
-use App\Enum\SystemStatus;
+use App\Enum\Status\SystemStatus;
 
 class Result
 {

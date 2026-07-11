@@ -8,6 +8,8 @@ return function(\Router\Router $router)
 
     $router->get('/politica-de-privacidade', 'PublicPagesController@showPrivacyPolicyPage');
 
+    $router->get('/termos-de-servico', 'PublicPagesController@showServiceTermsPage');
+
     $router->get('/app/politica-de-privacidade', 'PublicPagesController@showAppPrivacyPolicyPage');
 
     $router->get('/encup', 'PublicPagesController@showEncupPage');

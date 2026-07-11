@@ -37,7 +37,8 @@
         "psr-4": {
             "App\\" : "src/app/",
             "App\\Controller\\" : "src/app/controller/",
-            "App\\Enum\\" : "src/app/enum/",
+            "App\\Enum\\Result\\" : "src/app/enum/result/",
+            "App\\Enum\\Role\\" : "src/app/enum/role/",
             "App\\Enum\\Status\\" : "src/app/enum/status/",
             "App\\Enum\\Type\\" : "src/app/enum/type/",
             "App\\Exception\\" : "src/app/exception/",

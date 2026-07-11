@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% set mainClass = 'container text-center mt-5' %}
+
+{% block head %}
+<title>Cadastro - Brasil Cursinhos</title>
+<meta name="keywords" content="Cursinho PES; UFSC; Curso pré-vestibular; Projeto Educação Solidária; Araranguá">
+<meta name="description" content="Página de erro.">
+<meta name="robots" content="none">
+{% endblock head %}
+
+{% block main %}
+<main class="container-lg d-flex align-items-center" style="max-width: 1000px;">
+  <div class="w-100 text-center">
+    <h2 class="mb-4 fs-1 fw-bold">CADASTRO SALVO COM SUCESSO!</h2>
+  
+    {% if error == 'email' %}
+    <p class="fs-5 mb-5">Sua inscrição foi realizada com sucesso, mas houve um erro ao enviar o e-mail de verificação.</p>
+    {% else %}
+    <p class="fs-5 mb-5">Sua inscrição foi realizada com sucesso. Um e-mail de veficicação foi enviado para você. Siga as instruções para ativar a sua conta.</p>
+    {% endif %}
+    <!--<p class="fs-6"><strong>ATENÇÃO:</strong> A partir do dia 12 de fevereiro de 2026 você pode acessar a <a href="/login"><strong>página de login</strong></a> para criar a sua senha de acesso a <strong>Área do Candidato</strong>, realizar o envio dos documentos solicitados na etapa documental e conferir informações sobre as próximas etapas.</p>-->
+    <p class='fs-5 mt-4'><a href="/encup" class="fs-5 btn btn-secondary-pes px-4"><b>Voltar ao site</b></a></p>
+  </div>
+</main>        
+            
+{% endblock main %}

@@ -1,9 +1,9 @@
 <?php 
 namespace App\Repository;
 
-use App\Enum\UserRole;
-use App\Enum\UserStatus;
-use App\Enum\UserType;
+use App\Enum\Role\UserRole;
+use App\Enum\Status\UserStatus;
+use App\Enum\Type\UserType;
 use App\Model\PersonalData;
 use App\Model\User;
 use App\Util\Crypto;
@@ -53,6 +53,7 @@ class AccessRepository
     public function confirmVerificationCode(string $code) 
     {
         try {
+            
             $stmt = $this->pdo->prepare("UPDATE `VERIFICATION_CODES` SET `confirmedAt` = NOW() WHERE `code` = :code AND `sentAt` >= DATE_SUB(NOW(), INTERVAL 30 MINUTE)");
             $stmt->bindValue(':code', $code, PDO::PARAM_STR);
             $stmt->execute();
@@ -132,7 +133,7 @@ class AccessRepository
 
     public function getUserLogin(string $cpf): ?User
     {
-        $stmt = $this->pdo->prepare("SELECT u.`idUser` AS `id`, u.`passwordHash`, u.`type`, u.`status`, u.`loginAttempts`, pd.`firstName`, pd.`lastName`, pd.`socialName`, pd.`nickname`, pd.`pronouns`, pd.`gender`, pd.`cpf`, pd.`birthDate`, pd.`email`, pd.`phone` FROM `USERS` u INNER JOIN `PERSONAL_DATA` pd ON (u.`idUser` = pd.`idUser`) WHERE `cpfHash` = :cpfHash LIMIT 1");
+        $stmt = $this->pdo->prepare("SELECT u.`idUser` AS `id`, u.`passwordHash`, u.`type`, u.`status`, u.`loginAttempts`, pd.`fullName`, pd.`useSocialName`, pd.`socialName`, pd.`nickname`, pd.`pronouns`, pd.`genderIdentity`, pd.`ethnicity`, pd.`cpf`, pd.`birthDate`, pd.`email`, pd.`phone` FROM `USERS` u INNER JOIN `PERSONAL_DATA` pd ON (u.`idUser` = pd.`idUser`) WHERE `cpfHash` = :cpfHash LIMIT 1");
         $stmt->bindValue(':cpfHash', Crypto::hash($cpf), PDO::PARAM_LOB);
         $stmt->execute();
         $user = $stmt->fetch();
@@ -156,12 +157,13 @@ class AccessRepository
 
         $userAAD = 'USER_ID_' . $user->id;
         $personalData = new PersonalData(
-            firstName: Crypto::decrypt($user->firstName, $userAAD),
-            lastName: Crypto::decrypt($user->lastName, $userAAD),
-            socialName: !empty($user->socialName)? Crypto::decrypt($user->socialName, $userAAD):null,
+            fullName: Crypto::decrypt($user->fullName, $userAAD),
+            useSocialName: $user->useSocialName,
+            socialName: ($user->useSocialName == true)? Crypto::decrypt($user->socialName, $userAAD):null,
             nickname: Crypto::decrypt($user->nickname, $userAAD),
-            pronouns: Crypto::decrypt($user->pronouns, $userAAD),
-            gender: Crypto::decrypt($user->gender, $userAAD),
+            pronouns: json_decode(Crypto::decrypt($user->pronouns, $userAAD)),
+            genderIdentity: Crypto::decrypt($user->genderIdentity, $userAAD),
+            ethnicity: Crypto::decrypt($user->ethnicity, $userAAD),
             cpf: Crypto::decrypt($user->cpf, $userAAD),
             birthDate: new \DateTimeImmutable(Crypto::decrypt($user->birthDate, $userAAD)),
             email: Crypto::decrypt($user->email, $userAAD),
@@ -215,6 +217,68 @@ class AccessRepository
             return true;
         } catch(\Exception $exception) {
             return false;
+        }
+    }
+
+    public function isRegistred(string $cpf): bool
+    {
+        return false;
+    }
+
+    public function saveRegistrationn(PersonalData $personalData): int
+    {
+        try {
+
+            $this->pdo->beginTransaction();
+
+            $stmt = $this->pdo->prepare("INSERT INTO `USERS` (`cpfHash`, `type`, `status`, `createdAt`, `updatedAt`) VALUES(:cpfHash, :type_, :status_, NOW(), NOW())");
+            $stmt->bindValue(':cpfHash', Crypto::hash($personalData->cpf), PDO::PARAM_LOB);
+            $stmt->bindValue(':type_', UserType::EVENT_PARTICIPANT->value, PDO::PARAM_INT);
+            $stmt->bindValue(':status_', UserStatus::PENDING->value, PDO::PARAM_INT);
+            $stmt->execute();
+
+
+            $stmt = $this->pdo->prepare("INSERT INTO `PERSONAL_DATA` (`fullName`, `useSocialName`, `socialName`, `nickname`, `pronouns`, `genderIdentity`, `ethnicity`, `cpf`, `birthDate`, `email`, `emailHash`, `phone`, `phoneHash`, `address`, `idUser`, `createdAt`, `updatedAt`) VALUES(:fullName, :useSocialName, :socialName, :nickname, :pronouns, :genderIdentity, :ethnicity, :cpf, :birthDate, :email, :emailHash, :phone, :phoneHash, :address_, :idUser, NOW(), NOW())");
+
+            $userId =  $this->pdo->lastInsertId();
+            $userADD = 'USER_ID_' . $userId;
+            $stmt->bindValue(':fullName', Crypto::encrypt($personalData->fullName, $userADD), PDO::PARAM_LOB);
+            $stmt->bindValue(':useSocialName', $personalData->useSocialName, PDO::PARAM_BOOL);
+            if($personalData->useSocialName) {
+                $stmt->bindValue(':socialName', Crypto::encrypt($personalData->socialName, $userADD), PDO::PARAM_LOB);
+            } else {
+                $stmt->bindValue(':socialName', null, PDO::PARAM_NULL);
+            }
+            $stmt->bindValue(':nickname', Crypto::encrypt($personalData->nickname, $userADD), PDO::PARAM_LOB);
+            $stmt->bindValue(':pronouns', Crypto::encrypt(json_encode($personalData->pronouns), $userADD), PDO::PARAM_LOB);
+            $stmt->bindValue(':genderIdentity', Crypto::encrypt($personalData->genderIdentity, $userADD), PDO::PARAM_LOB);
+            $stmt->bindValue(':ethnicity', Crypto::encrypt($personalData->ethnicity, $userADD), PDO::PARAM_LOB);
+            $stmt->bindValue(':cpf', Crypto::encrypt($personalData->cpf, $userADD), PDO::PARAM_LOB);
+            $stmt->bindValue(':birthDate', Crypto::encrypt($personalData->birthDate->format('Y-m-d'), $userADD), PDO::PARAM_LOB);
+            $stmt->bindValue(':email', Crypto::encrypt($personalData->email, $userADD), PDO::PARAM_LOB);
+            $stmt->bindValue(':emailHash', Crypto::hash($personalData->email), PDO::PARAM_LOB);
+            $stmt->bindValue(':phone', Crypto::encrypt($personalData->phone, $userADD), PDO::PARAM_LOB);
+            $stmt->bindValue(':phoneHash', Crypto::hash($personalData->phone), PDO::PARAM_LOB);
+            $stmt->bindValue(':address_', Crypto::encrypt(json_encode($personalData->address), $userADD), PDO::PARAM_LOB);
+            $stmt->bindValue(':idUser', $userId, PDO::PARAM_INT);
+            $stmt->execute();
+
+            $stmt = $this->pdo->prepare("INSERT INTO `USER_ROLES` (`role`, `idUser`, `createdAt`) VALUES(:role_, :idUser, NOW())");
+            $stmt->bindValue(':role_', UserRole::EVENT_PARTICIPANT->value, PDO::PARAM_INT);
+            $stmt->bindValue(':idUser', $userId, PDO::PARAM_INT);
+            $stmt->execute();
+
+            $this->pdo->commit();
+
+            return (int)$userId;
+
+        } catch(\Exception $excetion) {
+
+            $this->pdo->rollBack();
+
+            Log::error('Erro ao inserir registro de usuário.', 'database.log', $excetion->getMessage());
+
+            throw $excetion;
         }
     }
 

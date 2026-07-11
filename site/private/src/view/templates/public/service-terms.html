@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% set bodyClass = 'bg-drawn' %}
+
+{% block head %}
+<title>Termos de Serviço - Eventos Brasil Cursinhos</title>
+<meta name="keywords" content="Brasil Cursinhos; Eventos; Cursinhos Universitários Populares; Educação Popular">
+<meta name="description" content="Política de Privacidade do site de Eventos da Brasil Cursinhos.">
+<meta name="robots" content="index, follow">
+{% endblock head %}
+
+{% block main %}
+<main class="d-flex justify-content-center align-items-center">
+  <div class="card m-4 maxw-900">
+    <div class="card-body text-justify">
+      <div class="mx-0 mx-lg-5">
+        <h1 class="text-center mb-5">Termos de Serviço</h1>
+        <p><strong>Data de vigência:</strong> 10 de julho de 2026.</p>
+        <h4 class="mt-4">1. Aceitação e Cadastro</h4>
+        <p>O acesso ao sistema de inscrições da Brasil Cursinhos exige a criação de uma conta pessoal. O usuário assume a responsabilidade de fornecer informações precisas e de manter a confidencialidade de suas credenciais de acesso. A falsidade nos dados inseridos, especialmente no envio de comprovantes de hipossuficiência econômica ou pagamentos, resulta no cancelamento imediato da inscrição e na suspensão da conta.</p>
+        <h4 class="mt-4">2. Inscrições e Pagamentos</h4>
+        <p>A confirmação da vaga nos eventos está condicionada à conciliação financeira. O participante necessita realizar o upload do comprovante de transferência bancária, do pagamento em lote ou do documento de solicitação de ingresso social diretamente na plataforma. A organização possui o direito de auditar os arquivos enviados e de rejeitar transações financeiras inconsistentes.</p>
+        <h4 class="mt-4">3. Regras de Utilização</h4>
+        <p>A plataforma é destinada exclusivamente para a gestão de participação nos eventos institucionais. É estritamente proibido subverter o sistema de concessão de descontos, enviar arquivos maliciosos nos formulários de envio de documentos criptografados ou compartilhar a titularidade da conta e dos ingressos adquiridos com terceiros sem autorização prévia.</p>
+      </div>
+    </div>
+  </div>
+</main>
+<footer class="w-100 text-white text-center">
+  <p class="my-2"><b>{{ "now" | date('Y')}} Brasil Cursinhos ©</b></p>
+</footer>
+{% endblock main %}

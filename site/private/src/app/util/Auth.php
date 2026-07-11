@@ -2,11 +2,11 @@
 // classe responsável por gerenciar e controlar a autenticação do usuário no sistema
 namespace App\Util;
 
-use App\Enum\AuthResult;
+use App\Enum\Result\AuthResult;
 use App\Model\User;
-use App\Enum\UserType;
-use App\Enum\UserStatus;
-use App\Enum\UserRole;
+use App\Enum\Type\UserType;
+use App\Enum\Status\UserStatus;
+use App\Enum\Role\UserRole;
 use App\Model\PersonalData;
 use App\Repository\AccessRepository;
 
@@ -110,14 +110,15 @@ class Auth
         if (isset($sessionPayload['personalData'])) {
             $pd = $sessionPayload['personalData'];
             
-            if (isset($pd['firstName'], $pd['lastName'], $pd['nickname'], $pd['pronouns'], $pd['gender'], $pd['cpf'], $pd['birthDate'], $pd['email'], $pd['phone'])) {
+            if (isset($pd['fullName'], $pd['useSocialName'], $pd['ethnicity'], $pd['nickname'], $pd['pronouns'], $pd['genderIdentity'], $pd['cpf'], $pd['birthDate'], $pd['email'], $pd['phone'])) {
                 try {
                     $personalData = new PersonalData(
-                        firstName: $pd['firstName'],
-                        lastName: $pd['lastName'],
+                        fullName: $pd['fullName'],
+                        useSocialName: $pd['useSocialName'],
                         nickname: $pd['nickname'],
                         pronouns: $pd['pronouns'],
-                        gender: $pd['gender'],
+                        genderIdentity: $pd['genderIdentity'],
+                        ethnicity: $pd['ethnicity'],
                         cpf: $pd['cpf'],
                         birthDate: new \DateTimeImmutable($pd['birthDate']),
                         email: $pd['email'],
@@ -150,11 +151,12 @@ class Auth
 
         if ($user->personalData !== null) {
             $payload['personalData'] = [
-                'firstName' => $user->personalData->firstName,
-                'lastName' => $user->personalData->lastName,
+                'fullName' => $user->personalData->fullName,
+                'useSocialName' => $user->personalData->useSocialName,
                 'nickname' => $user->personalData->nickname,
                 'pronouns' => $user->personalData->pronouns,
-                'gender' => $user->personalData->gender,
+                'genderIdentity' => $user->personalData->genderIdentity,
+                'ethnicity' => $user->personalData->ethnicity,
                 'cpf' => $user->personalData->cpf,
                 'birthDate' => $user->personalData->birthDate->format('Y-m-d'),
                 'email' => $user->personalData->email,

@@ -2,9 +2,9 @@
 
 namespace App\Model;
 
-use App\Enum\UserType;
-use App\Enum\UserStatus;
-use App\Enum\UserRole;
+use App\Enum\Type\UserType;
+use App\Enum\Status\UserStatus;
+use App\Enum\Role\UserRole;
 use App\Trait\ModelImmutableCopy;
 
 class User

@@ -18,7 +18,11 @@ return function(\Router\Router $router)
 
     $router->get('/redefinir-senha', 'AccessController@showResetPasswordResultPage');
 
-    $router->get('/cadastrar', 'AccessController@showSubscriptionPage');
+    $router->post('/cadastro', 'AccessController@checkRegistrationExistence');
 
-    $router->post('/cadastrar', 'AccessController@saveSubscription');
+    $router->get('/cadastrar', 'AccessController@showSubscriptionForm');
+
+    $router->post('/cadastrar', 'AccessController@saveRegistration');
+
+    $router->get('/cadastrar/sucesso', 'AccessController@showSuccessRegistrationPage');
 };

@@ -87,8 +87,8 @@ class AccessController {
 
                             $email = Email::create();
                             
-                            $email->subject('Recuperação de conta - Cursinho PES');
-                            $email->replyTo('suporte@pes.ufsc.br', 'Suporte - Cursinho PES');
+                            $email->subject('Recuperação de conta - Brasil Cursinhos');
+                            $email->replyTo('suporte@brasilcursinhos.org', 'Suporte - Brasil Cursinhos');
                             $email->to($user->email, $user->nickname);
                             $email->renderBody('recover-account.html', [
                                 'name' => $user->nickname,
@@ -230,8 +230,8 @@ class AccessController {
 
                 $email = Email::create();
                 
-                $email->subject('Recuperação de conta - Cursinho PES');
-                $email->replyTo('suporte@brasilcursinhos.org', 'Suporte - rasil Cursinhos');
+                $email->subject('Ativação de conta - Brasil Cursinhos');
+                $email->replyTo('suporte@brasilcursinhos.org', 'Suporte - Brasil Cursinhos');
                 $email->to($personalData->email, $personalData->nickname);
                 $email->renderBody('recover-account.html', [
                     'name' => $personalData->nickname,

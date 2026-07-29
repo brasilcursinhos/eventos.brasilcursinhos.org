@@ -6,7 +6,7 @@ use App\Model\Address;
 use DateTime;
 use DateTimeZone;
 use DateTimeImmutable;
-use App\Model\EmergencyInfo;
+use App\Model\EmergencyData;
 use App\Model\PersonalContact;
 use App\Model\PersonalData;
 
@@ -302,7 +302,7 @@ class ValidatorService
         );
     }
 
-    public function validateEmergencyInfo(array $data): EmergencyInfo
+    public function validateEmergencyInfo(array $data): EmergencyData
     {
         $errors = [];
         $validatedData = [];
@@ -331,16 +331,43 @@ class ValidatorService
             $errors['emergency-contact-phone'] = 'Telefone do contato de emergência ausente ou inválido!';
         }
 
+        $name2 = $this->validatePersonalName($data['emergency-contact-name-2']);
+
+        if($name2 !== false) {
+            $validatedData['name2'] = $name2;
+        } else {
+            $validatedData['name2'] = null;
+        }
+
+        $kinship2 = $this->validateString($data['emergency-contact-kinship-2']);
+
+        if($kinship2 !== '') {
+            $validatedData['kinship2'] = $kinship2;
+        } else {
+            $validatedData['kinship2'] = null;
+        }
+
+        $phone2 = $this->validatePhoneNumber($data['emergency-contact-phone-2']);
+
+        if($phone2 !== false) {
+            $validatedData['phone2'] = $phone2;
+        } else {
+            $validatedData['phone2'] = null;
+        }
+
         $validatedData['health-conditions'] = $this->validateString($data['health-conditions']);
 
         if(!empty($errors)) {
             throw new ValidationException($errors);
         }
 
-        return new EmergencyInfo(
+        return new EmergencyData(
             name: $validatedData['name'],
             kinship: $validatedData['kinship'],
             phone: $validatedData['phone'],
+            name2: $validatedData['name2'],
+            kinship2: $validatedData['kinship2'],
+            phone2: $validatedData['phone2'],
             healthConditions: $validatedData['health-conditions']
         );
     }

@@ -5,7 +5,7 @@ class Crypto
 {
     private static string $hashKey;
     private static string $encKey;
-    //private static string $fileKey;
+    private static string $fileKey;
 
     private function __construct() {}
 
@@ -19,9 +19,9 @@ class Crypto
             self::$encKey = base64_decode($_ENV['APP_KEY_ENC']);
         }
 
-        /*if(!isset(self::$fileKey)){
+        if(!isset(self::$fileKey)){
             self::$fileKey = base64_decode($_ENV['APP_KEY_FILE']);
-        }*/
+        }
     }
 
     public static function hash(string $message, int $length = SODIUM_CRYPTO_GENERICHASH_BYTES): string
@@ -31,17 +31,17 @@ class Crypto
         return sodium_crypto_generichash($message, self::$hashKey, $length);
     }
 
-    public static function encrypt(string $message, string $aad = '') : string
+    public static function encrypt(string $message, string $aad = '', bool $isFile = false) : string
     {
         self::init();
 
         $nonce = random_bytes(SODIUM_CRYPTO_AEAD_XCHACHA20POLY1305_IETF_NPUBBYTES);
-        $cipher = sodium_crypto_aead_xchacha20poly1305_ietf_encrypt($message, $aad, $nonce, self::$encKey);
+        $cipher = sodium_crypto_aead_xchacha20poly1305_ietf_encrypt($message, $aad, $nonce, $isFile? self::$fileKey:self::$encKey);
         // Payload bin: payload version(1) + key version(1) + nonce + cipher
         return pack('CC', 1, 1) . $nonce . $cipher;
     }
 
-    public static function decrypt(string $payload, string $aad = ''): string|false
+    public static function decrypt(string $payload, string $aad = '', bool $isFile = false): string|false
     {
         self::init();
         
@@ -51,6 +51,6 @@ class Crypto
         $nonceSize = SODIUM_CRYPTO_AEAD_XCHACHA20POLY1305_IETF_NPUBBYTES;
         $nonce = substr($payload, 2, $nonceSize);
         $cipher = substr($payload, 2 + $nonceSize);
-        return sodium_crypto_aead_xchacha20poly1305_ietf_decrypt($cipher, $aad, $nonce, self::$encKey);
+        return sodium_crypto_aead_xchacha20poly1305_ietf_decrypt($cipher, $aad, $nonce, $isFile? self::$fileKey:self::$encKey);
     }
 }

@@ -3,7 +3,7 @@ namespace App\Service;
 
 class ErrorService
 {
-    public static function getErrorHttpDescription($code)
+    public static function getErrorHttpDescription(string $code): array
     {
         $data = array();
         $data['description'] = "";

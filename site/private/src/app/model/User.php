@@ -37,4 +37,20 @@ class User
     {
         return $this->personalData?->nickname;
     }
+
+    public function getName(): ?string
+    {
+        if ($this->personalData === null) {
+            return null;
+        }
+
+        return $this->personalData->useSocialName 
+            ? $this->personalData->socialName 
+            : $this->personalData->fullName;
+    }
+
+    public function getAge(): ?int
+    {
+        return $this->personalData?->birthDate->diff(new \DateTimeImmutable())->y;
+    }
 }

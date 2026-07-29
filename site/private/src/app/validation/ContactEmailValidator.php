@@ -34,40 +34,35 @@ class ContactEmailValidator
         switch($this->validator->validateInt($data['subject'])) {
             case 1:
                 $validatedData['subject'] = 'Dúvida';
-                $validatedData['recipient'] = 'contato@pes.ufsc.br';
+                $validatedData['recipient'] = 'eventos@brasilcursinhos.org';
                 break;
             case 2:
                 $validatedData['subject'] = 'Sugestão';
-                $validatedData['recipient'] = 'contato@pes.ufsc.br';
+                $validatedData['recipient'] = 'eventos@brasilcursinhos.org';
                 break;
             case 3:
                 $validatedData['subject'] = 'Reclamação ou Elogio';
-                $validatedData['recipient'] = 'contato@pes.ufsc.br';
+                $validatedData['recipient'] = 'eventos@brasilcursinhos.org';
                 break;
             case 4:
                 $validatedData['subject'] = 'Doação ou Parceria';
-                $validatedData['recipient'] = 'financeiro@pes.ufsc.br';
+                $validatedData['recipient'] = 'financeiro@brasilcursinhos.org';
                 break;
             case 5:
                 $validatedData['subject'] = 'Relatório de Dados Pessoais  (LGPD)';
-                $validatedData['recipient'] = 'lgpd@pes.ufsc.br';
+                $validatedData['recipient'] = 'lgpd@brasilcursinhos.org';
                 break;
             case 6:
                 $validatedData['subject'] = 'Exclusão de Dados Pessoais (LGPD)';
-                $validatedData['recipient'] = 'lgpd@pes.ufsc.br';
+                $validatedData['recipient'] = 'lgpd@brasilcursinhos.org';
                 break;
             case 7:
                 $validatedData['subject'] = 'Suporte Técnico (Site)';
-                $validatedData['recipient'] = 'suporte@pes.ufsc.br';
-                break;
-            case 8:
-                $validatedData['subject'] = 'Processo Seletivo ' . $this->validator->validateString($data['type-selection']);
-                $validatedData['recipient'] = 'processoseletivo@pes.ufsc.br';
-                $validatedData['registration'] = $this->validator->validateRegistrationNumber($data['registration-number']);
+                $validatedData['recipient'] = 'suporte@brasilcursinhos.org';
                 break;
             default:
                 $validatedData['subject'] = 'Outros Assuntos';
-                $validatedData['recipient'] = 'contato@pes.ufsc.br';
+                $validatedData['recipient'] = 'eventos@brasilcursinhos.org';
         }
         $message = $this->validator->validateString($data['message']);
         if(!empty($message)) {
@@ -87,8 +82,7 @@ class ContactEmailValidator
             $validatedData['subject'],
             $validatedData['recipient'],
             $validatedData['message'],
-            $validatedData['messageHtml'],
-            $validatedData['registration'] ?? ''
+            $validatedData['messageHtml']
         );
     }
 }

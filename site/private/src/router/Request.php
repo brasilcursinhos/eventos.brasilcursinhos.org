@@ -4,16 +4,16 @@ namespace Router;
 
 class Request
 {
-    protected $base;
-    protected $uri;
-    protected $method;
-    protected $contentType;
-    protected $protocol;
-    protected $host;
-    protected $data = [];
-    protected $files = [];
-    protected $headers = [];
-    protected $rawBody = '';
+    protected string $base;
+    protected string $uri;
+    protected string $method;
+    protected string $contentType;
+    protected string $protocol;
+    protected string $host;
+    protected array $data = [];
+    protected array $files = [];
+    protected array $headers = [];
+    protected string $rawBody = '';
  
     public function __construct()
     {
@@ -39,7 +39,7 @@ class Request
         return $isHttps;
     }
 
-    protected function setData()
+    protected function setData(): void
     {
         switch($this->method)
         {
@@ -84,24 +84,24 @@ class Request
         return hash_equals($expectedSignature, $receivedSignature);
     }
 
-    public function raw()
+    public function raw(): string
     {
         return $this->rawBody;
     }
  
-    protected function setFiles()
+    protected function setFiles(): void
     {
         foreach ($_FILES as $key => $value) {
             $this->files[$key] = $value;
         }
     }
     
-    public function base()
+    public function base(): string
     {
         return $this->base;
     }
  
-    public function uri()
+    public function uri(): string
     {
         return $this->uri;
     }
@@ -111,27 +111,27 @@ class Request
         return $this->host;
     }
  
-    public function method()
+    public function method(): string
     {
         return $this->method;
     }
 
-    public function contentType()
+    public function contentType(): string
     {
         return $this->contentType;
     }
 
-    public function all()
+    public function all(): array
     {
         return $this->data;
     }
  
-    public function __isset($key)
+    public function __isset(string $key): bool
     {
         return isset($this->data[$key]);
     }
  
-    public function __get($key)
+    public function __get(string $key): mixed
     {
         if(isset($this->data[$key])) {
             return $this->data[$key];
@@ -139,12 +139,12 @@ class Request
         return null;
     }
  
-    public function hasFile($key)
+    public function hasFile(string $key): bool
     {
         return isset($this->files[$key]);
     }
     
-    public function file($key)
+    public function file(string $key): ?array
     {  
         if(isset($this->files[$key])) {
             return $this->files[$key];
@@ -152,17 +152,15 @@ class Request
         return null;
     }
 
-    public function allFiles()
+    public function allFiles(): array
     {
         return $this->files;
     }
 
-    public function header(string $key, $default = null)
+    public function header(string $key, mixed $default = null)
     {
-        // normaliza key
         $key = strtolower(str_replace('_', '-', $key));
 
-        // Remove o prefixo "http-" se ele foi incluído na string de busca
         if (strpos($key, 'http-') === 0) {
             $key = substr($key, 5);
         }

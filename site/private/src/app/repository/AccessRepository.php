@@ -158,7 +158,7 @@ class AccessRepository
         $userAAD = 'USER_ID_' . $user->id;
         $personalData = new PersonalData(
             fullName: Crypto::decrypt($user->fullName, $userAAD),
-            useSocialName: $user->useSocialName,
+            useSocialName: (bool) $user->useSocialName,
             socialName: ($user->useSocialName == true)? Crypto::decrypt($user->socialName, $userAAD):null,
             nickname: Crypto::decrypt($user->nickname, $userAAD),
             pronouns: json_decode(Crypto::decrypt($user->pronouns, $userAAD)),

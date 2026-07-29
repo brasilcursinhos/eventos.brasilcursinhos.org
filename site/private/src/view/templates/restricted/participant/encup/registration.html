@@ -1,0 +1,503 @@
+{% extends "restricted/participant/base.html" %}
+
+{% block main2 %}
+<h1 class="mt-3 mb-0 fw-bold">Inscrição ENCUP 2026</h1>
+<hr class="border-5 mt-2 mb-3">
+{% if saveRegistrationStatus is defined %}
+  {% if saveRegistrationStatus.name == 'SUCCESS' %}
+  <div class="row my-5 justify-content-center text-center">
+    <h3 class="mb-5 fw-bold">INSCRIÇÃO SALVA COM SUCESSO!</h3>
+    <p class="mb-1">Sua inscrição foi salva com sucesso.</p>
+    <p class="mb-1">Acesse o botão abaixo para conferir a sua inscrição e realizar o pagamento se necessário.</p>
+    <p class="mb-5">Você pode retornar ao site a qualquer momento para consultar o status da sua inscrição.</p>
+    <a class="btn btn-secondary-bc w-auto px-3 text-decoration-none" href="/participante/encup"><strong>Conferir status da inscrição</strong></a>
+  </div>
+  {% else %}
+  <div class="row my-5 justify-content-center text-center">
+    <h3 class="mb-5 fw-bold">ERRO AO SALVAR INSCRIÇÃO!</h3>
+    <p>Houve um erro ao salvar a sua inscrição.</p>
+    <p><strong>ERRO:</strong> {{saveRegistrationStatus.label}}</p>
+    <p class="mb-5">Tente se inscrever novamente, se o erro persistir <a href="/contato" target="_blank"><strong>entre em contato com o suporte</strong></a>.</p>
+    <a class="btn btn-secondary-bc w-auto px-3 text-decoration-none" href="/participante/encup"><strong>Tentar novamente</strong></a>
+  </div>
+  {% endif %}
+{% else %}
+  {% if event.canAcceptRegistrations() or exceptionalRegistration %}
+    <form action="/participante/encup/inscricao" method="post" enctype="multipart/form-data" id="form-encup-registration">
+      <section id="start">
+        <input type="hidden" name="user-id" value="{{user.id}}">
+        <input type="hidden" name="event-id" value="{{event.id}}">
+        <input type="hidden" name="MAX_FILE_SIZE" value="2097152">
+        {{ csrf_field() }}
+        <p>Olá, amante da educação popular!</p>
+        <p>
+          Este é o formulário de inscrições para o 11º Encontro Nacional dos Cursinhos Universitários Populares (ENCUP), promovido pela Brasil Cursinhos.
+        </p>
+        <p>
+          O ENCUP é um evento realizado desde 2016, com o propósito de fortalecimento do Movimento de Cursinhos Universitários Populares, por meio de palestras e oficinas, mas principalmente por momentos de integração que incentivem as trocas de experiências entre os assessores e professores dos pré-vestibulares.
+        </p>
+        <p class="mb-1">
+          📆 <strong>Quando:</strong> 15 e 16 de agosto, das 09h às 17h
+        </p>
+        <p>
+          📌 <strong>Local:</strong> <a href="https://maps.app.goo.gl/hFE1GgMnCRR1RMuKA" target="_blank">FGV EAESP</a> - Bela Vista, São Paulo.
+        </p>
+        {% if registrationType == 'normal' %}
+        <p>
+          Os valores para inscrição estão divididos em categorias:
+        </p>
+        <div class="ms-3">
+          <p class="mb-1 fw-medium">Para membros de cursinhos filiados à Brasil Cursinhos</p>
+          <ul>
+            <li>Ingresso 1 dia (apenas sábado ou apenas domingo): R$ 55</li>
+            <li>Ingresso 2 dias (sábado e domingo): R$ 75</li>
+          </ul>
+          <p class="mb-1 fw-medium">Para o público em geral</p>
+          <ul>
+            <li>Ingresso 1 dia (apenas sábado ou apenas domingo): R$ 90</li>
+            <li>Ingresso 2 dias (sábado e domingo): R$ 120</li>
+          </ul>
+        </div>
+        <p>
+          O pagamento poderá ser feito via Pix.
+        </p>
+        <p>
+          Por que cobramos ingresso? O evento tem seu custo de produção, como por exemplo alimentação e kit do participante. Por isso, cobramos o ingresso para subsidiar as despesas.
+        </p>
+        {% endif %}
+        <p>
+          Ao final da sua inscrição, você receberá um e-mail de confirmação do pedido.
+          Você também poderá acompanhar sua inscrição voltando a este site a qualquer momento.
+        </p>
+        <p>
+          Desejamos um excelente ENCUP 2026!
+        </p>
+        <p>
+          Abraços,<br>
+          Brasil Cursinhos 💙
+        </p>
+      </section>
+      {% if user.age < 18 %}
+      <section class="d-none" id="authorization">
+        <div class="card mb-3">
+          <div class="card-header">
+            <strong >AUTORIZAÇÃO PARA MENOR DE IDADE</strong>
+          </div>
+          <div class="card-body">
+            <p>Para participar do evento você vai precisar anexar a autorização de participação de menor de idade assina por algum responsável legal. O não envio da autorização implicará no cancelamento da sua inscrição.</p>
+            <p>Acesse o <a href="https://docs.google.com/document/d/1NCpHRdwDcukXjH-PLGUreFXpGcb3YXo6LK28NyZPmDs/edit?usp=sharing" target="_blank"><strong>modelo da autorização</strong></a>, faça uma cópia do arquivo, substitua as informações destacadas e peça para o seu responsável assinar.</p>
+            <p>Recomendamos que a assinatura seja realizada através da assinatura eletrônica em <a href="https://assinador.iti.br/" target="_blank"><strong>https://assinador.iti.br/</strong></a> de acordo com as instruções diponíveis no <a href="https://www.gov.br/governodigital/pt-br/identidade/assinatura-eletronica" target="_blank"><strong>Portal do Governo Federal</strong></a>. Caso seja realizada a assinatura manuscrita no documento impresso, ao digitalizar a autorização você também deve incluir a cópia do documento de identificação do seu responsável legal no mesmo arquivo.</p>
+            <p>Para digitalizar a autorização impressa em formato PDF você pode utilizar o aplicativo <a href="https://www.adobe.com/br/acrobat/mobile/scanner-app.html" target="_blank"><strong>Adobe Scan</strong></a> disponível na loja de aplicativos do seu celular.</p>
+            <hr>
+            <div class="row g-2">
+              <div class="col">
+                <label for="proof-authorization" class="form-label"><strong>Autorização de participação:</strong></label>
+                <input class="form-control" type="file" id="proof-authorization" name="proof-authorization" accept="application/pdf">
+              </div>
+              <small class="mt-2">O arquivo deve estar salvo em formato <strong>PDF</strong> e ter tamanho de <strong>até 2MB</strong>.</small>
+            </div>
+          </div>
+        </div>
+      </section>
+      {% endif %}
+      <section class="d-none" id="additional-info">
+        <h4 class="fw-bold mb-3">Informações adicionais</h4>
+        <div class="card mb-3" id="dietary-restrictions-fields">
+          <div class="card-header">
+            <strong>RESTRIÇÕES ALIMENTARARES</strong>
+          </div>
+          <div class="card-body">
+            <p>Você possuí algum tipo de restrição ou alergia alimentar?</p>
+            <div class="row mb-3 g-3">
+              <div class="col-12">
+                <div class="form-check">
+                  <input class="form-check-input checkbox-dietary-restriction" type="checkbox" name="no-restriction" id="no-restriction">
+                  <label class="form-check-label" for="no-restriction">Nenhuma restrição alimentar</label>
+                </div>
+              </div>
+              <div class="col-12">
+                <div class="form-check">
+                  <input class="form-check-input checkbox-dietary-restriction" type="checkbox" name="vegan" id="vegan">
+                  <label class="form-check-label" for="vegan">Vegano</label>
+                </div>
+              </div>
+              <div class="col-12">
+                <div class="form-check">
+                  <input class="form-check-input checkbox-dietary-restriction" type="checkbox" name="vegetarian" id="vegetarian">
+                  <label class="form-check-label" for="vegetarian">Vegetariano</label>
+                </div>
+              </div>
+              <div class="col-12">
+                <div class="form-check">
+                  <input class="form-check-input checkbox-dietary-restriction" type="checkbox" name="lactose-intolerance" id="lactose-intolerance">
+                  <label class="form-check-label" for="lactose-intolerance">Intolerância à lactose</label>
+                </div>
+              </div>
+              <div class="col-12">
+                <div class="form-check">
+                  <input class="form-check-input checkbox-dietary-restriction" type="checkbox" name="gluten-intolerance" id="gluten-intolerance">
+                  <label class="form-check-label" for="gluten-intolerance">Doença Celíaca / Intolerância ao glúten</label>
+                </div>
+              </div>
+              <div class="col-12">
+                <div class="form-check">
+                  <input class="form-check-input checkbox-dietary-restriction" type="checkbox" name="sugar-restriction" id="sugar-restriction">
+                  <label class="form-check-label" for="sugar-restriction">Diabetes / Restrição de ingestão de açúcar</label>
+                </div>
+              </div>
+              <div class="col-12">
+                <div class="form-check">
+                  <input class="form-check-input checkbox-dietary-restriction" type="checkbox" name="nut-allergy" id="nut-allergy">
+                  <label class="form-check-label" for="nut-allergy">Alergia a amendoim, nozes ou castanhas</label>
+                </div>
+              </div>
+              <div class="col-12">
+                <div class="form-check">
+                  <input class="form-check-input checkbox-dietary-restriction" type="checkbox" name="egg-allergy" id="egg-allergy">
+                  <label class="form-check-label" for="egg-allergy">Alergia a ovos</label>
+                </div>
+              </div>
+              <div class="col-12">
+                <div class="form-check">
+                  <input class="form-check-input checkbox-dietary-restriction" type="checkbox" name="seafood-allergy" id="seafood-allergy">
+                  <label class="form-check-label" for="seafood-allergy">Alergia a frutos do mar</label>
+                </div>
+              </div>
+              <div class="col-12">
+                <div class="form-check">
+                  <input class="form-check-input checkbox-dietary-restriction" type="checkbox" name="cow-milk-allergy" id="cow-milk-allergy">
+                  <label class="form-check-label" for="cow-milk-allergy">Alergia à proteína do leite de vaca (APLV)</label>
+                </div>
+              </div>
+              <div class="col-12">
+                <div class="form-check d-flex align-items-center gap-2">
+                  <input class="form-check-input checkbox-dietary-restriction" type="checkbox" name="other-restriction" id="other-restriction">
+                  <label class="form-check-label text-nowrap" for="other-restriction">Outro:</label>
+                  <input type="text" class="form-control form-control-sm" name="other-restriction-text" id="other-restriction-text" disabled>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card" id="emergency-contact-fields">
+          <div class="card-header">
+            <strong>INFORMAÇÕES DE EMERGÊNCIA</strong>
+          </div>
+          <div class="card-body">
+            <p class="mb-2">Neste campo você deve indicar um contato de algum familiar ou colega, maior de idade, para o caso de emergências.</p>
+            <div class="row g-2 mb-3">
+              <div class="col-12 col-lg-5">
+                <label for="emergency-contact-name" class="form-label"><b>Nome completo do contato 1:</b></label>
+                <input type="text" class="form-control" id="emergency-contact-name" name="emergency-contact-name" placeholder="Preenchimento obrigatório">
+              </div>
+              <div class="col-6 col-lg-3">
+                <label for="emergency-contact-kinship" class="form-label"><b>Parentesco:</b></label>
+                <select name="emergency-contact-kinship" id="emergency-contact-kinship" class="form-select">
+                  <option value="">Selecione...</option>
+                  <option value="Pai/mãe">Pai/mãe</option>
+                  <option value="Avô/Avó">Avô/Avó</option>
+                  <option value="Tio/Tia">Tio/Tia</option>
+                  <option value="Irmão/Irmã">Irmão/Irmã</option>
+                  <option value="Esposo/Esposa">Esposo/Esposa</option>
+                  <option value="Filho/Filha">Filho/Filha</option>
+                  <option value="Outro">Outro</option>
+                </select>
+              </div>
+              <div class="col-6 col-lg-4">
+                <label for="emergency-contact-phone" class="form-label"><b>Telefone do contato 1:</b></label>
+                <input type="text" class="form-control" id="emergency-contact-phone" name="emergency-contact-phone" placeholder="(__) _____-____">
+              </div>
+            </div>
+            <div class="row g-2 mb-3">
+              <div class="col-12 col-lg-5">
+                <label for="emergency-contact-name-2" class="form-label"><b>Nome completo do contato 2:</b></label>
+                <input type="text" class="form-control" id="emergency-contact-name-2" name="emergency-contact-name-2" placeholder="Preenchimento opcional">
+              </div>
+              <div class="col-6 col-lg-3">
+                <label for="emergency-contact-kinship-2" class="form-label"><b>Parentesco:</b></label>
+                <select name="emergency-contact-kinship-2" id="emergency-contact-kinship-2" class="form-select">
+                  <option value="">Selecione...</option>
+                  <option value="Pai/mãe">Pai/mãe</option>
+                  <option value="Avô/Avó">Avô/Avó</option>
+                  <option value="Tio/Tia">Tio/Tia</option>
+                  <option value="Irmão/Irmã">Irmão/Irmã</option>
+                  <option value="Esposo/Esposa">Esposo/Esposa</option>
+                  <option value="Filho/Filha">Filho/Filha</option>
+                  <option value="Outro">Outro</option>
+                </select>
+              </div>
+              <div class="col-6 col-lg-4">
+                <label for="emergency-contact-phone-2" class="form-label"><b>Telefone do contato 2:</b></label>
+                <input type="text" class="form-control" id="emergency-contact-phone-2" name="emergency-contact-phone-2" placeholder="(__) _____-____">
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-12">
+                <label for="health-conditions" class="form-label">Caso você possua alguma alergia, faça uso de algum medicamento contínuo e/ou possua alguma outra condição de saúde relevante pode descrever aqui:</label>
+                <textarea class="form-control" id="health-conditions" name="health-conditions" rows="3" placeholder="Preenchimento opicional"></textarea>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section class="d-none" id="organization">
+        <h4 class="fw-bold mb-3">Vínculo Institucional</h4>
+        <div class="card mb-3">
+          <div class="card-header">
+            <strong>VÍNCULO COM CURSINHO POPULAR</strong>
+          </div>
+          <div class="card-body">
+            <div class="row mb-3">
+              <div class="col">
+                <p class="form-label d-block">Você faz parte de algum cursinho popular?</p>
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="radio" name="participates-cup" id="participates-cup-yes" value="yes">
+                  <label class="form-check-label" for="participates-cup-yes">Sim</label>
+                </div>
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="radio" name="participates-cup" id="participates-cup-no" value="no">
+                  <label class="form-check-label" for="participates-cup-no">Não</label>
+                </div>
+              </div>
+            </div>
+            <div class="row d-none mb-3" id="participates-affiliated-cup-field">
+              <div class="col">
+                <p>O seu cursinho popular é filiado a Brasil Cursinhos?</p>
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="radio" name="participates-affiliated-cup" id="participates-affiliated-cup-yes" value="yes">
+                  <label class="form-check-label" for="participates-affiliated-cup-yes">Sim</label>
+                </div>
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="radio" name="participates-affiliated-cup" id="participates-affiliated-cup-no" value="no">
+                  <label class="form-check-label" for="participates-affiliated-cup-no">Não</label>
+                </div>
+              </div>
+            </div>
+            <div class="row d-none" id="affiliated-cup-name-field">
+              <div class="col-auto">
+                <label for="affiliated-cup-name" class="form-label"><b>Selecione o seu cursinho:</b></label>
+                <select name="organization-name" id="affiliated-cup-name" class="form-select" disabled>
+                  <option value="">Selecione...</option>
+                  <option value='Brasil Cursinhos'>Brasil Cursinhos</option>
+                  <option value='CEUE Pré-Vestibular'>CEUE Pré-Vestibular</option>
+                  <option value='Cursinho FEA USP'>Cursinho FEA USP</option>
+                  <option value='Cursinho FGV'>Cursinho FGV</option>
+                  <option value='Cursinho Flavi USP '>Cursinho Flavi USP </option>
+                  <option value='Cursinho GeraBixo '>Cursinho GeraBixo </option>
+                  <option value='Cursinho Insper '>Cursinho Insper </option>
+                  <option value='Cursinho MedAprova'>Cursinho MedAprova</option>
+                  <option value='Cursinho Nubo'>Cursinho Nubo</option>
+                  <option value='Cursinho PES'>Cursinho PES</option>
+                  <option value='Cursinho Popular da Medicina (CPM)'>Cursinho Popular da Medicina (CPM)</option>
+                  <option value='Cursinho Popular da Poli'>Cursinho Popular da Poli</option>
+                  <option value='Cursinho Popular EACH-USP'>Cursinho Popular EACH-USP</option>
+                  <option value='Cursinho Popular Hypatia de Exatas'>Cursinho Popular Hypatia de Exatas</option>
+                  <option value='Curso Alberto Santos Dumont - CASD'>Curso Alberto Santos Dumont - CASD</option>
+                  <option value='Curso Assistencial Amigos de Itajubá - CAAI'>Curso Assistencial Amigos de Itajubá - CAAI</option>
+                  <option value='Curso Assistencial Theodomiro Santiago - CATS'>Curso Assistencial Theodomiro Santiago - CATS</option>
+                  <option value='Curso Pré-Vestibular Paulo Freire'>Curso Pré-Vestibular Paulo Freire</option>
+                  <option value='Edificar'>Edificar</option>
+                  <option value='Einstein Floripa'>Einstein Floripa</option>
+                  <option value='Equalizar - Cursinho Popular'>Equalizar - Cursinho Popular</option>
+                  <option value='FACE Educa'>FACE Educa</option>
+                  <option value='Galt Vestibulares'>Galt Vestibulares</option>
+                  <option value='Garibaldi Cursinho Popular'>Garibaldi Cursinho Popular</option>
+                  <option value='Garra - Cursinho Popular'>Garra - Cursinho Popular</option>
+                  <option value='Marie Curie Vestibulares'>Marie Curie Vestibulares</option>
+                  <option value='Olimpo Pré-Vestibular'>Olimpo Pré-Vestibular</option>
+                  <option value='PREVEC'>PREVEC</option>
+                  <option value='Projeto Pontes Sorocaba'>Projeto Pontes Sorocaba</option>
+                  <option value='Vestibular Cidadão'>Vestibular Cidadão</option>
+                </select>
+              </div>
+            </div>
+            <div class="row mb-3 d-none" id="participates-other-organization-field">
+              <div class="col">
+                <p>Você faz parte de algum outro tipo de organização ou instituição ligada a educação?</p>
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="radio" name="participates-other-organization" id="participates-other-organization-yes" value="yes">
+                  <label class="form-check-label" for="participates-other-organization-yes">Sim</label>
+                </div>
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="radio" name="participates-other-organization" id="participates-other-organization-no" value="no">
+                  <label class="form-check-label" for="participates-other-organization-no">Não</label>
+                </div>
+              </div>
+            </div>
+            <div class="row g-2 mb-1 d-none" id="other-organization-name-field">
+              <div class="col">
+                <label for="other-organization-name" class="form-label" id="other-organization-name-label"><b>Nome da sua organização:</b></label>
+                <input type="text" class="form-control" id="other-organization-name" name="organization-name" placeholder="Digite o nome da organização" disabled>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section class="d-none" id="ticket-selection">
+        <h4 class="fw-bold mb-3">Seleção do ingresso</h4>   
+        {% if registrationType == 'staffbc' %}
+        <input type="hidden" name="event-registration-type" value="staffbc">
+        <div class="card mb-3">
+          <div class="card-header">
+            <strong>INGRESSO - STAFF BC</strong>
+          </div>
+          <div class="card-body">
+            <p>Selecione o seu ingresso:</p>
+          {% for ticket in tickets %}
+            {% if ticket.type.name == 'BC_STAFF' %}
+            <div class="form-check mt-2">
+              <input class="form-check-input" type="radio" name="ticket-id" value="{{ticket.id}}" id="ticket-id-{{ticket.id}}" data-ticket-name="{{ticket.name}}" data-ticket-price="{{ticket.price}}" data-ticket-type="{{ticket.type.label}}">
+              <label class="form-check-label" for="ticket-id-{{ticket.id}}">
+                {{ticket.name}} (R$ {{ticket.price}})
+              </label>
+            </div>
+            {% endif %}
+          {% endfor %}
+          </div>
+        </div>
+        {% elseif registrationType == 'staffcup' %}
+        <input type="hidden" name="event-registration-type" value="staffcup">
+        <div class="card mb-3">
+          <div class="card-header">
+            <strong>INGRESSO - STAFF CUPs</strong>
+          </div>
+          <div class="card-body">
+            <p>Selecione o seu ingresso:</p>
+          {% for ticket in tickets %}
+            {% if ticket.type.name == 'CUP_STAFF' %}
+            <div class="form-check mt-2">
+              <input class="form-check-input" type="radio" name="ticket-id" value="{{ticket.id}}" id="ticket-id-{{ticket.id}}" data-ticket-name="{{ticket.name}}" data-ticket-price="{{ticket.price}}" data-ticket-type="{{ticket.type.label}}">
+              <label class="form-check-label" for="ticket-id-{{ticket.id}}">
+                {{ticket.name}} (R$ {{ticket.price}})
+              </label>
+            </div>
+            {% endif %}
+          {% endfor %}
+          </div>
+        </div>
+        {% elseif registrationType == 'convidado' %}
+        <input type="hidden" name="event-registration-type" value="guest">
+        <div class="card mb-3">
+          <div class="card-header">
+            <strong>INGRESSO - CONVIDADO</strong>
+          </div>
+          <div class="card-body">
+            <p>Selecione o seu ingresso:</p>
+          {% for ticket in tickets %}
+            {% if ticket.type.name == 'GUEST' %}
+            <div class="form-check mt-2">
+              <input class="form-check-input" type="radio" name="ticket-id" value="{{ticket.id}}" id="ticket-id-{{ticket.id}}" data-ticket-name="{{ticket.name}}" data-ticket-price="{{ticket.price}}" data-ticket-type="{{ticket.type.label}}">
+              <label class="form-check-label" for="ticket-id-{{ticket.id}}">
+                {{ticket.name}} (R$ {{ticket.price}})
+              </label>
+            </div>
+            {% endif %}
+          {% endfor %}
+          </div>
+        </div>
+        {% elseif registrationType == 'palestrante' %}
+        <input type="hidden" name="event-registration-type" value="speaker">
+        <div class="card mb-3">
+          <div class="card-header">
+            <strong>INGRESSO - PALESTRANTE</strong>
+          </div>
+          <div class="card-body">
+            <p>Selecione o seu ingresso:</p>
+          {% for ticket in tickets %}
+            {% if ticket.type.name == 'SPEAKER' %}
+            <div class="form-check mt-2">
+              <input class="form-check-input" type="radio" name="ticket-id" value="{{ticket.id}}" id="ticket-id-{{ticket.id}}" data-ticket-name="{{ticket.name}}" data-ticket-price="{{ticket.price}}" data-ticket-type="{{ticket.type.label}}">
+              <label class="form-check-label" for="ticket-id-{{ticket.id}}">
+                {{ticket.name}} (R$ {{ticket.price}})
+              </label>
+            </div>
+            {% endif %}
+          {% endfor %}
+          </div>
+        </div>
+        {% else %}
+        <input type="hidden" name="event-registration-type" value="normal">
+        <div class="card mb-3" id="tickets-external-participant">
+          <div class="card-header">
+            <strong>INGRESSO - PARTICIPANTE EXTERNO</strong>
+          </div>
+          <div class="card-body">
+            <p>Selecione o seu ingresso:</p>
+          {% for ticket in tickets %}
+            {% if ticket.type.name == 'EXTERNAL_PARTICIPANT' %}
+            <div class="form-check mt-2">
+              <input class="form-check-input" type="radio" name="ticket-id" value="{{ticket.id}}" id="ticket-id-{{ticket.id}}" data-ticket-name="{{ticket.name}}" data-ticket-price="{{ticket.price}}" data-ticket-type="{{ticket.type.label}}">
+              <label class="form-check-label" for="ticket-id-{{ticket.id}}">
+                {{ticket.name}} (R$ {{ticket.price}})
+              </label>
+            </div>
+            {% endif %}
+          {% endfor %}
+          </div>
+        </div>
+        <div class="card mb-3" id="tickets-affiliated-cup-member">
+          <div class="card-header">
+            <strong>INGRESSO - CUP FILIADO</strong>
+          </div>
+          <div class="card-body">
+            <p>Selecione o seu ingresso:</p>
+          {% for ticket in tickets %}
+            {% if ticket.type.name == 'AFFILIATED_CUP_MEMBER' %}
+            <div class="form-check mt-2">
+              <input class="form-check-input" type="radio" name="ticket-id" value="{{ticket.id}}" id="ticket-id-{{ticket.id}}" data-ticket-name="{{ticket.name}}" data-ticket-price="{{ticket.price}}" data-ticket-type="{{ticket.type.label}}">
+              <label class="form-check-label" for="ticket-id-{{ticket.id}}">
+                {{ticket.name}} (R$ {{ticket.price}})
+              </label>
+            </div>
+            {% endif %}
+          {% endfor %}
+          </div>
+        </div>
+        {% endif %}
+      </section>
+      <section class="d-none" id="order-review">
+        <h4 class="fw-bold mb-3">Revisão da inscrição</h4>
+        <div class="card">
+          <div class="card-header">
+            <strong>RESUMO DA INSCRIÇÃO</strong>
+          </div>
+          <div class="card-body">
+            <p class="mb-2"><strong>Participante:</strong> {{user.name}}</p>
+            <p class="mb-2"><strong>Tipo de ingresso:</strong> <span id="review-ticket-type-field"></span></p>
+            <p class="mb-2"><strong>Ingresso:</strong> <span id="review-ticket-field"></span></p>
+            <p><strong>Valor:</strong> <span id="review-amount-field"></span></p>
+            <p id="payment-instructions">Após salvar a sua inscrição serão apresentadas as informações para realizar o pagamento da taxa de inscrição e o envio do comprovante.</p>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" value="" name="review-confirmation" id="review-confirmation">
+              <label class="form-check-label" for="review-confirmation">
+                Confirmo que revisei os dados de inscrição no evento e eles estão corretos.
+              </label>
+            </div>
+          </div>
+        </div> 
+      </section>
+    </form>
+    <hr class="border-5">
+    <div class="row mb-4 text-cencer">
+      <div class="col text-end">
+        <button class="btn btn-cancel-bc" id="btn-previous-section"><strong>Cancelar</strong></button>
+      </div>
+      <dic class="col text-start">
+        <button class="btn btn-secondary-bc" id="btn-next-section"><strong>Próximo</strong></button>
+      </dic>
+    </div>
+  {% else %}
+  <p>O prazo de inscrição já encerrou.</p>
+  <div class="row">
+    <div class="col-auto">
+      <a class="btn btn-secondary-bc text-decoration-none"><strong>Voltar a página inicial</strong></a>
+    </div>
+  </div>
+  {% endif %}
+{% endif %}
+{% endblock main2 %}
+
+{% block scriptsJS %}
+{% include '@links/forms-validation.html' %}
+<script src="/assets/js/pages/restricted/event-registration.js" defer></script>
+{% endblock scriptsJS %}

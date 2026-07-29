@@ -9,7 +9,6 @@ class ContactEmail
         public readonly string $subject,
         public readonly string $recipient,
         public readonly string $message,
-        public readonly string $messageHtml,
-        public readonly ?string $registration = null
+        public readonly string $messageHtml
     ) { }
 }

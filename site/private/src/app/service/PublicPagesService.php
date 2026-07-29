@@ -1,7 +1,7 @@
 <?php 
 namespace App\Service;
 
-use App\Enum\SystemStatus;
+use App\Enum\Status\SystemStatus;
 use App\Exception\EmailException;
 use App\Util\Email;
 use App\Validation\ContactEmailValidator;

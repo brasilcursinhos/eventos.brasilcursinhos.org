@@ -3,7 +3,9 @@
 
     ini_set('default_charset', 'utf-8');
     ini_set('date.timezone', 'America/Sao_Paulo');
-    ini_set('memory_limit', '256M');
+    ini_set('memory_limit', '512M');
+    ini_set('max_execution_time', '60');
+    ini_set('max_input_time', '60');
 
     ini_set('zend.assertions', PRODUCTION_MODE ? -1 : 1);
 

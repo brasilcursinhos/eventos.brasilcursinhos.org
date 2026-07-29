@@ -21,6 +21,7 @@ class Viewer {
             $loader->addPath(DIR_TEMPLATES.'public/', 'public');
             $loader->addPath(DIR_TEMPLATES.'restricted/', 'restricted');
             $loader->addPath(DIR_TEMPLATES.'restricted/admin/', 'admin');
+            $loader->addPath(DIR_TEMPLATES.'restricted/member/', 'member');
             $loader->addPath(DIR_TEMPLATES.'restricted/participant/', 'participant');
             if(PRODUCTION_MODE) {
                 $cache = [

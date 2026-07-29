@@ -1,0 +1,24 @@
+{% extends "restricted/participant/base.html" %}
+
+{% block main2 %}
+<h1 class="mt-3 mb-0 fw-bold">Acompanhar Inscrição</h1>
+<hr class="border-5 mt-2 mb-3">
+<div class="card mb-3">
+  <div class="card-header">
+    <strong>RESUMO DA INSCRIÇÃO</strong>
+  </div>
+  <div class="card-body">
+    <p class="mb-2"><strong>Evento:</strong> {{event.title}}</p>
+    <p class="mb-2"><strong>Participante:</strong> {{user.name}}</p>
+    <p class="mb-2"><strong>Tipo de ingresso:</strong> {{ticket.type.label()}}</p>
+    <p class="mb-2"><strong>Ingresso:</strong> {{ticket.name}}</p>
+    <p class="mb-4"><strong>Valor:</strong> R$ {{registration.amountDue|number_format(2, ',', '.')}}</p>
+    <p><strong>STATUS DA INSCRIÇÃO:</strong> {{registration.status.label}}</p>
+  </div>
+</div>
+{% endblock main2 %}
+
+{% block scriptsJS %}
+{% include '@links/forms-validation.html' %}
+<script src="/assets/js/pages/restricted/event-payment.js" defer></script>
+{% endblock scriptsJS %}

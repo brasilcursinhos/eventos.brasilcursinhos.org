@@ -18,6 +18,7 @@
 /*!40101 SET character_set_client = utf8mb4 */;
 
 -- Excluindo tabelas
+DROP TABLE IF EXISTS `BC_ACCOUNT_TRANSACTIONS`;
 DROP TABLE IF EXISTS `SOCIAL_DISCOUNT_REQUESTS`;
 DROP TABLE IF EXISTS `TRANSACTION_BENEFICIARIES`;
 DROP TABLE IF EXISTS `FINANCIAL_TRANSACTIONS`;
@@ -30,22 +31,24 @@ DROP TABLE IF EXISTS `ACTIVITY_SESSIONS`;
 DROP TABLE IF EXISTS `EVENT_SCHEDULES`;
 DROP TABLE IF EXISTS `EVENT_DATES`;
 DROP TABLE IF EXISTS `EVENTS`;
-DROP TABLE IF EXISTS `VERIFICATION_CODES`;
-DROP TABLE IF EXISTS `PERSONAL_DATA`;
-DROP TABLE IF EXISTS `USER_ROLES`;
-DROP TABLE IF EXISTS `USERS`;
+-- DROP TABLE IF EXISTS `VERIFICATION_CODES`;
+-- DROP TABLE IF EXISTS `PERSONAL_DATA`;
+-- DROP TABLE IF EXISTS `USER_ROLES`;
+-- DROP TABLE IF EXISTS `USERS`;
 DROP TABLE IF EXISTS `FILES`;
 
 -- Criação das tabelas
 CREATE TABLE IF NOT EXISTS `FILES` (
 	`idFile` INT NOT NULL AUTO_INCREMENT,
 	`originalName` VARCHAR(256) NOT NULL,
-    `storedName` VARCHAR(64) NOT NULL,
+    `storedName` VARCHAR(128) NOT NULL,
+    `path` VARCHAR(256) NULL DEFAULT NULL,
     `mimeType` VARCHAR(128) NOT NULL,
     `size` INT NOT NULL,
+    `isEncrypted` BOOLEAN NOT NULL DEFAULT FALSE,
     `createdAt` DATETIME NOT NULL,
 	PRIMARY KEY (`idFile`),
-    UNIQUE INDEX `idxFilesStoredName` (`storedName` ASC)
+    UNIQUE INDEX `idxFilesPathStoredName` (`path` ASC, `storedName` ASC)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `USERS` (
@@ -122,16 +125,19 @@ CREATE TABLE IF NOT EXISTS `EVENTS` (
     `modality` INT NOT NULL,
     `type` INT NOT NULL,
     `status` INT NOT NULL,
+    `descriptions` JSON NULL DEFAULT NULL,
 	`registrationOpenAt` DATETIME NOT NULL,
     `registrationCloseAt` DATETIME NOT NULL,
+    `socialRequestOpenAt` DATETIME NOT NULL,
+    `socialRequestCloseAt` DATETIME NOT NULL,
     `createdAt` DATETIME NOT NULL,
     `updatedAt` DATETIME NOT NULL,
     PRIMARY KEY (`idEvent`),
     UNIQUE INDEX `idxEventsTypeYearEdition` (`type` ASC, `year` DESC, `edition` DESC)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-INSERT INTO `EVENTS`(`idEvent`, `title`, `edition`, `year`, `location`, `modality`, `type`, `status`, `registrationOpenAt`, `registrationCloseAt`, `createdAt`, `updatedAt`) VALUES 
-(1, 'ENCUP 2026', 11, '2026', 'FGV - São Paulo/SP', 1, 2, 2, '2026-07-10 20:00:00', '2026-08-05 23:59:59', NOW(), NOW());
+INSERT INTO `EVENTS`(`idEvent`, `title`, `edition`, `year`, `location`, `modality`, `type`, `status`, `registrationOpenAt`, `registrationCloseAt`, `socialRequestOpenAt`, `socialRequestCloseAt`, `createdAt`, `updatedAt`) VALUES 
+(1, 'ENCUP 2026', 11, '2026', 'FGV - São Paulo/SP', 1, 3, 2, '2026-07-10 00:00:00', '2026-08-10 23:59:59', '2026-07-10 00:00:00', '2026-07-31 23:59:59', NOW(), NOW());
 
 CREATE TABLE IF NOT EXISTS `EVENT_DATES` (
     `idEventDate` INT NOT NULL AUTO_INCREMENT,
@@ -182,6 +188,8 @@ CREATE TABLE IF NOT EXISTS `EVENT_TICKETS` (
     `idEventTicket` INT NOT NULL AUTO_INCREMENT,
     `name` VARCHAR(64) NOT NULL,
     `price` DECIMAL(6, 2) NOT NULL,
+    `paymentDetails` JSON NOT NULL,
+    `type` INT NOT NULL,
     `description` TEXT NULL DEFAULT NULL,
     `isActive` BOOLEAN NOT NULL DEFAULT TRUE,
     `idEvent` INT NOT NULL,
@@ -191,10 +199,26 @@ CREATE TABLE IF NOT EXISTS `EVENT_TICKETS` (
     CONSTRAINT `fkEventTicketsEvents` FOREIGN KEY (`idEvent`) REFERENCES `EVENTS`(`idEvent`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-INSERT INTO `EVENT_TICKETS`(`idEventTicket`, `name`, `price`, `idEvent`, `createdAt`, `updatedAt`) VALUES 
-(1, 'Ingresso 2 dias (sábado e domingo)', 75.00, 1, NOW(), NOW()),
-(2, 'Ingresso 1 dia (sábado)', 55.00, 1, NOW(), NOW()),
-(3, 'Ingresso 1 dia (domingo)', 55.00, 1, NOW(), NOW());
+INSERT INTO `EVENT_TICKETS`(`idEventTicket`, `name`, `price`, `paymentDetails`, `type`, `idEvent`, `createdAt`, `updatedAt`) VALUES 
+(1, '1 DIA - Apenas Sábado', 55.00, '{}', 1, 1, NOW(), NOW()),
+(2, '1 DIA - Apenas Domingo', 55.00, '{}', 1, 1, NOW(), NOW()),
+(3, '2 DIAS - Sábado e Domingo', 75.00, '{}', 1, 1, NOW(), NOW()),
+(4, '1 DIA - Apenas Sábado', 90.00, '{}', 2, 1, NOW(), NOW()),
+(5, '1 DIA - Apenas Domingo', 90.00, '{}', 2, 1, NOW(), NOW()),
+(6, '2 DIAS - Sábado e Domingo', 120.00, '{}', 2, 1, NOW(), NOW()),
+(7, '1 DIA - Apenas Sábado', 0.00, '{}', 3, 1, NOW(), NOW()),
+(8, '1 DIA - Apenas Domingo', 0.00, '{}', 3, 1, NOW(), NOW()),
+(9, '2 DIAS - Sábado e Domingo', 0.00, '{}', 3, 1, NOW(), NOW()),
+(10, '1 DIA - Apenas Sábado', 55.00, '{}', 4, 1, NOW(), NOW()),
+(11, '1 DIA - Apenas Domingo', 55.00, '{}', 4, 1, NOW(), NOW()),
+(12, '2 DIAS - Sábado e Domingo', 55.00, '{}', 4, 1, NOW(), NOW()),
+(13, '1 DIA - Apenas Sábado', 0.00, '{}', 5, 1, NOW(), NOW()),
+(14, '1 DIA - Apenas Domingo', 0.00, '{}', 5, 1, NOW(), NOW()),
+(15, '2 DIAS - Sábado e Domingo', 0.00, '{}', 5, 1, NOW(), NOW()),
+(16, '1 DIA - Apenas Sábado', 0.00, '{}', 6, 1, NOW(), NOW()),
+(17, '1 DIA - Apenas Domingo', 0.00, '{}', 6, 1, NOW(), NOW()),
+(18, '2 DIAS - Sábado e Domingo', 0.00, '{}', 6, 1, NOW(), NOW());
+
 
 CREATE TABLE IF NOT EXISTS `TICKET_ALLOWED_DATES` (
     `idTicketAllowedDates` INT NOT NULL AUTO_INCREMENT,
@@ -209,9 +233,29 @@ CREATE TABLE IF NOT EXISTS `TICKET_ALLOWED_DATES` (
 
 INSERT INTO `TICKET_ALLOWED_DATES`(`idTicketAllowedDates`, `idEventTicket`, `idEventDate`, `createdAt`) VALUES 
 (1, 1, 1, NOW()),
-(2, 1, 2, NOW()),
-(3, 2, 1, NOW()),
-(4, 3, 2, NOW());
+(2, 2, 2, NOW()),
+(3, 3, 1, NOW()),
+(4, 3, 2, NOW()),
+(5, 4, 1, NOW()),
+(6, 5, 2, NOW()),
+(7, 6, 1, NOW()),
+(8, 6, 2, NOW()),
+(9, 7, 1, NOW()),
+(10, 8, 2, NOW()),
+(11, 9, 1, NOW()),
+(12, 9, 2, NOW()),
+(13, 10, 1, NOW()),
+(14, 11, 2, NOW()),
+(15, 12, 1, NOW()),
+(16, 12, 2, NOW()),
+(17, 13, 1, NOW()),
+(18, 14, 2, NOW()),
+(19, 15, 1, NOW()),
+(20, 15, 2, NOW()),
+(21, 16, 1, NOW()),
+(22, 17, 2, NOW()),
+(23, 18, 1, NOW()),
+(24, 18, 2, NOW());
 
 CREATE TABLE IF NOT EXISTS `EVENT_REGISTRATIONS` (
 	`idEventRegistration` INT NOT NULL AUTO_INCREMENT,
@@ -221,20 +265,20 @@ CREATE TABLE IF NOT EXISTS `EVENT_REGISTRATIONS` (
     `status` INT NOT NULL,
     `basePrice` DECIMAL(6, 2) NOT NULL,
     `amountDue` DECIMAL(6, 2) NOT NULL,
-    `organizationName` VARCHAR(64) NOT NULL,
+    `organizationName` VARCHAR(128) NOT NULL,
     `additionalData` JSON NULL DEFAULT NULL,
     `emergencyData` BLOB NOT NULL,
     `idEvent` INT NOT NULL,
     `idEventTicket` INT NOT NULL,
     `idUser` INT NOT NULL,
-    `idProofAutorization` INT NULL DEFAULT NULL,
+    `idProofAuthorization` INT NULL DEFAULT NULL,
     `createdAt` DATETIME NOT NULL,
     `updatedAt` DATETIME NOT NULL,
 	PRIMARY KEY (`idEventRegistration`),
     CONSTRAINT `fkEventRegistrationsEvents` FOREIGN KEY (`idEvent`) REFERENCES `EVENTS`(`idEvent`),
     CONSTRAINT `fkEventRegistrationsEventTickets` FOREIGN KEY (`idEventTicket`) REFERENCES `EVENT_TICKETS`(`idEventTicket`),
     CONSTRAINT `fkEventRegistrationsUsers` FOREIGN KEY (`idUser`) REFERENCES `USERS`(`idUser`),
-    CONSTRAINT `fkEventRegistrationsFiles` FOREIGN KEY (`idProofAutorization`) REFERENCES `FILES`(`idFile`),
+    CONSTRAINT `fkEventRegistrationsFiles` FOREIGN KEY (`idProofAuthorization`) REFERENCES `FILES`(`idFile`),
     UNIQUE INDEX `idxEventRegistrationsEventUser` (`idEvent` DESC, `idUser` ASC),
     UNIQUE INDEX `idxEventRegistrationsRegistrationHash` (`registrationHash`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -310,6 +354,19 @@ CREATE TABLE IF NOT EXISTS `SOCIAL_DISCOUNT_REQUESTS` (
     CONSTRAINT `fkSocialDiscountRequestsEventRegistrations` FOREIGN KEY (`idEventRegistration`) REFERENCES `EVENT_REGISTRATIONS`(`idEventRegistration`),
     CONSTRAINT `fkSocialDiscountRequestsFiles` FOREIGN KEY (`idProofRequest`) REFERENCES `FILES`(`idFile`),
     UNIQUE INDEX `idxSocialDiscountRequestsEventRegistration` (`idEventRegistration`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `BC_ACCOUNT_TRANSACTIONS` (
+	`idBcAccountTransaction` INT NOT NULL AUTO_INCREMENT,
+    `transactionId` VARBINARY(128) NOT NULL,
+    `transactionIdHash` VARBINARY(64) NOT NULL,
+    `amount` DECIMAL(6, 2) NULL DEFAULT NULL,
+    `datetime` DATETIME NOT NULL,
+    `status` INT NOT NULL,
+    `createdAt` DATETIME NOT NULL,
+    `updatedAt` DATETIME NOT NULL,
+	PRIMARY KEY (`idBcAccountTransaction`),
+    UNIQUE INDEX `idxBcAccountTransactionsTransactionIdHash` (`transactionIdHash`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Restaura as variáveis originais do sistema

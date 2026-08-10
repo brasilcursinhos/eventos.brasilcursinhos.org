@@ -63,4 +63,9 @@ return function(\Router\Router $router)
         'set' => '/administrador/conciliar-transacoes',
         'roles' => [UserRole::ADMINSTRATOR]
     ], 'AdministratorController@reconcileTransactions');
+
+    $router->post([
+        'set' => '/administrador/transacoes',
+        'roles' => [UserRole::ADMINSTRATOR]
+    ], 'AdministratorController@updateTransactionId');
 };

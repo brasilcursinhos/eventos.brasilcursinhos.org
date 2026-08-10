@@ -376,4 +376,18 @@ class EventsRepository
             return false;
         }
     }
+
+    public function updateTransactionId(int $transactionId, string $providerTransactionId, int $userId): bool
+    {
+        try {
+            $stmt = $this->pdo->prepare("UPDATE `FINANCIAL_TRANSACTIONS` SET `providerTransactionId` = :providerTransactionId, `providerTransactionIdHash` = :providerTransactionIdHash, `updatedAt` = NOW() WHERE `idFinancialTransaction` = :transactionId AND `status` = 1 LIMIT 1");
+            $stmt->bindValue(':providerTransactionId', Crypto::encrypt($providerTransactionId, ('USER_ID_'.$userId)), PDO::PARAM_LOB);
+            $stmt->bindValue(':providerTransactionIdHash', Crypto::hash($providerTransactionId), PDO::PARAM_LOB);
+            $stmt->bindValue(':transactionId', $transactionId, PDO::PARAM_INT);
+            $stmt->execute();
+            return true;
+        } catch(\Exception $e) {
+            return false;
+        }
+    }
 }

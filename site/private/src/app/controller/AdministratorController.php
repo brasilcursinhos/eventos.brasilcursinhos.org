@@ -167,7 +167,7 @@ class AdministratorController
 
     public function showTransactionsPage(EventsRepository $repository, ?string $code = null): Response
     {
-        $transactions = $repository->getTransactions(is_null($code)? false:true);
+        $transactions = $repository->getTransactions(is_null($code)? true:false);
         return Response::html('@admin/transactions.html', [ 'links' => $this->links, 'transactions' => $transactions])->withoutCache();
     }
 
@@ -185,7 +185,19 @@ class AdministratorController
                 $repository->updateTransactionStatus($newTransaction);
             }
         }
-        return Response::redirect('/administrador/transacoes', 303);
+        return Response::redirect('/administrador/transacoes/pendentes', 303);
+    }
+
+    public function updateTransactionId(Request $request, EventsRepository $repository): Response
+    {
+        $userId = ValidatorService::validateInt($request->__get('user-id'));
+        $transactionId = ValidatorService::validateInt($request->__get('transaction-id'));
+        $providerTransactionId = ValidatorService::validateString($request->__get('provider-id'));
+        if($userId && $providerTransactionId && $transactionId) {
+            $repository->updateTransactionId($transactionId, $providerTransactionId, $userId);
+        }
+        
+        return Response::redirect('/administrador/transacoes/pendentes', 303);
     }
 
 }

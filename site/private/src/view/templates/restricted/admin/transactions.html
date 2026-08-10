@@ -8,7 +8,7 @@
       {{ csrf_field() }}
       <input type="hidden" name="user-id" value="{{transaction.userId}}">
       <input type="hidden" name="transaction-id" value="{{transaction.id}}">
-      <div class="row">
+      <div class="row mb-2">
         <div class="col-auto">
           {{'%03d'|format(transaction.id)}}
         </div>

@@ -222,6 +222,14 @@ class AccessRepository
 
     public function isRegistred(string $cpf): bool
     {
+        $stmt = $this->pdo->prepare("SELECT `idUser` AS `id` FROM `USERS` WHERE `cpfHash` = :cpfHash LIMIT 1");
+        $stmt->bindValue(':cpfHash', Crypto::hash($cpf), PDO::PARAM_LOB);
+        $stmt->execute();
+        $user = $stmt->fetch();
+        
+        if($user) {
+            return true;
+        }
         return false;
     }
 

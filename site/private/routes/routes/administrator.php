@@ -10,77 +10,52 @@ return function(\Router\Router $router)
     ], 'AdministratorController@showHomePage');
 
     $router->get([
-        'set' => '/administrador/entrevistas',
-        'roles' => [UserRole::ADMINSTRATOR]
-    ], 'AdministratorController@showInterviewsPage');
-
-    $router->get([
-        'set' => '/administrador/agendamentos',
-        'roles' => [UserRole::ADMINSTRATOR]
-    ], 'AdministratorController@showSchedulesPage');
-
-    $router->post([
-        'set' => '/administrador/entrevista/confirmar',
-        'roles' => [UserRole::ADMINSTRATOR]
-    ], 'AdministratorController@confirmInterview');
-
-    $router->post([
-        'set' => '/administrador/entrevista/salvar',
-        'roles' => [UserRole::ADMINSTRATOR]
-    ], 'AdministratorController@saveInterview');
-
-    $router->get([
-        'set' => '/administrador/insert',
-        'roles' => [UserRole::ADMINSTRATOR]
-    ], 'AdministratorController@insertUsers');
-
-    $router->get([
-        'set' => '/administrador/insert-students',
-        'roles' => [UserRole::ADMINSTRATOR]
-    ], 'AdministratorController@insertStudents');
-
-    $router->get([
-        'set' => '/administrador/entrevistas/{room}',
-        'roles' => [UserRole::ADMINSTRATOR]
-    ], 'AdministratorController@getInterviews');
-
-    $router->get([
-        'set' => '/administrador/candidatos/{type}',
-        'roles' => [UserRole::ADMINSTRATOR]
-    ], 'AdministratorController@getMemberCandidates');
-
-    $router->get([
-        'set' => '/administrador/membros/',
-        'roles' => [UserRole::ADMINSTRATOR]
-    ], 'AdministratorController@showMembersPage');
-
-    $router->post([
-        'set' => '/administrador/membro',
-        'roles' => [UserRole::ADMINSTRATOR]
-    ], 'AdministratorController@showMemberRegister');
-
-    $router->get([
-        'set' => '/administrador/membro',
-        'roles' => [UserRole::ADMINSTRATOR]
-    ], 'AdministratorController@showMemberRegister');
-
-    $router->get([
-        'set' => '/administrador/alunos/',
-        'roles' => [UserRole::ADMINSTRATOR]
-    ], 'AdministratorController@showStudentsPage');
-
-    $router->post([
-        'set' => '/administrador/aluno',
-        'roles' => [UserRole::ADMINSTRATOR]
-    ], 'AdministratorController@showStudentRegister');
-
-    $router->get([
-        'set' => '/administrador/aluno',
-        'roles' => [UserRole::ADMINSTRATOR]
-    ], 'AdministratorController@showStudentRegister');
-
-    $router->get([
         'set' => '/info',
         'roles' => [UserRole::ADMINSTRATOR]
     ], 'AdministratorController@showInfoPage');
+
+    $router->get([
+        'set' => '/administrador/encup/',
+        'roles' => [UserRole::ADMINSTRATOR]
+    ], 'AdministratorController@showEncupPage');
+
+    $router->get([
+        'set' => '/administrador/conciliacao',
+        'roles' => [UserRole::ADMINSTRATOR]
+    ], 'AdministratorController@showInfoPage');
+
+    $router->post([
+        'set' => '/administrador/encup/inscricao',
+        'roles' => [UserRole::ADMINSTRATOR]
+    ], 'AdministratorController@showRegistrationPage');
+
+    $router->post([
+        'set' => '/administrador/encup/pagamento',
+        'roles' => [UserRole::ADMINSTRATOR]
+    ], 'AdministratorController@showPaymentPage');
+
+    $router->post([
+        'set' => '/administrador/cadastro',
+        'roles' => [UserRole::ADMINSTRATOR]
+    ], 'AccessController@checkRegistrationExistence');
+
+    $router->get([
+        'set' => '/administrador/pagamento-lote/{amount}',
+        'roles' => [UserRole::ADMINSTRATOR]
+    ], 'AdministratorController@showBatchPaymentPage');
+
+    $router->post([
+        'set' => '/administrador/pagamento-lote/{amount}',
+        'roles' => [UserRole::ADMINSTRATOR]
+    ], 'AdministratorController@saveBatchPayment');
+
+    $router->get([
+        'set' => '/administrador/transacoes',
+        'roles' => [UserRole::ADMINSTRATOR]
+    ], 'AdministratorController@showTransactionsPage');
+
+    $router->get([
+        'set' => '/administrador/conciliar-transacoes',
+        'roles' => [UserRole::ADMINSTRATOR]
+    ], 'AdministratorController@reconcileTransactions');
 };

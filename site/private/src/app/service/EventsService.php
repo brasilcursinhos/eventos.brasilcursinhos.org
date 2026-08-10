@@ -11,6 +11,7 @@ use App\Exception\ValidationException;
 use App\Model\Result;
 use App\Model\Event;
 use App\Model\FinancialTransaction;
+use App\Repository\AdministratorRepository;
 use App\Repository\EventsRepository;
 use App\Repository\FileRepository;
 use App\Util\Auth;
@@ -209,8 +210,11 @@ class EventsService
                 encrypt: true,
                 encryptionAAD: $userAAD,
                 allowedMimeTypes: ['application/pdf', 'image/*'],
-                relativePath: 'encup/2026'
+                relativePath: 'encup/2026',
+                returnContent: true
             );
+            $pixIdExtractor = new PixIdExtractorService();
+            $providerTransactionId = $pixIdExtractor->extractE2eId($file->content, $file->mimeType);
             $transaction = new FinancialTransaction(
                 id: null,
                 status: FinancialTransactionStatus::UNDER_REVIEW,
@@ -219,9 +223,93 @@ class EventsService
                 userId: $user->id,
                 eventId: $event->id,
                 registrationId: $registration?->id,
-                idProofTransaction: null
+                idProofTransaction: null,
+                providerTransactionId: $providerTransactionId
             );
-            $transaction = $this->repository->saveFinancialTransaction($transaction, $file);
+            $beneficiaries = [];
+            $beneficiaries[] = ['cpf' => $user->personalData->cpf, 'ticket-id' => $registration->ticketId];
+            $transaction = $this->repository->saveFinancialTransaction($transaction, $file, $beneficiaries);
+        } catch(FileException $exception) {
+            return Result::failure(SystemStatus::FILE_ERROR);
+        } catch(PDOException $exception) {
+            return Result::failure(SystemStatus::DATABASE_ERROR);
+        }
+
+        // comprovante recebido
+
+        return Result::success();
+    }
+
+    public function saveBatchPayment(Request $request, AdministratorRepository $adminRepo, int $amount): Result
+    {
+        try {
+            $cpfUser = ValidatorService::validateCpf($request->__get('cpf-1'));
+            $eventId = ValidatorService::validateInt($request->__get('event-id'));
+            $totalAmount = ValidatorService::validateNumber($request->__get('total-amount'));
+            
+            if(!$cpfUser) {
+                throw new ValidationException(['user-id' => 'ID do usuário não informado.']);
+            }
+
+            if(!$eventId) {
+                throw new ValidationException(['event-id' => 'ID do evento não informado.']);
+            }
+
+            if(!$totalAmount) {
+                throw new ValidationException(['total-amount' => 'Valor total não informado.']);
+            }
+
+            $user = $adminRepo->getUser($cpfUser);
+
+            if(is_null($user)) {
+                throw new ValidationException(['user-id' => 'O usuário é inválido ou inexistente.']);
+            }
+            
+            $event = $this->repository->getEvent($eventId);
+
+            if(is_null($event)) {
+                throw new ValidationException(['event-id' => 'O evento é inválido ou inexistente.']);
+            }
+            $beneficiaries = [];
+            for($i = 1; $i <= $amount; $i++) {
+                $cpf = ValidatorService::validateCpf($request->__get('cpf-'.$i));
+                $ticket = ValidatorService::validateInt($request->__get('ticket-id-'.$i));
+                if(!$cpf || !$ticket) {
+                    throw new ValidationException(['data' => 'CPF ou id do ingresso inválido.']);
+                }
+                $beneficiaries[] = ['cpf' => $cpf, 'ticket-id' => $ticket];
+            }
+            
+        } catch(ValidationException $exception) {
+            return Result::failure(SystemStatus::VALIDATION_ERROR, $exception->getMessage(), $exception->getErrors());
+        } catch(PDOException $exception) {
+            return Result::failure(SystemStatus::DATABASE_ERROR);
+        }
+
+        try {
+            $userAAD = 'USER_ID_' . $user->id;
+            $file = FileManager::saveUpload(
+                fileArray: $request->file('payment-proof'),
+                encrypt: true,
+                encryptionAAD: $userAAD,
+                allowedMimeTypes: ['application/pdf', 'image/*'],
+                relativePath: 'encup/2026',
+                returnContent: true
+            );
+            $pixIdExtractor = new PixIdExtractorService();
+            $providerTransactionId = $pixIdExtractor->extractE2eId($file->content, $file->mimeType);
+            $transaction = new FinancialTransaction(
+                id: null,
+                status: FinancialTransactionStatus::UNDER_REVIEW,
+                paymentMethod: PaymentMethodType::PIX,
+                totalAmount: $totalAmount,
+                userId: $user->id,
+                eventId: $event->id,
+                registrationId: null,
+                idProofTransaction: null,
+                providerTransactionId: $providerTransactionId
+            );
+            $transaction = $this->repository->saveFinancialTransaction($transaction, $file, $beneficiaries);
         } catch(FileException $exception) {
             return Result::failure(SystemStatus::FILE_ERROR);
         } catch(PDOException $exception) {

@@ -3,7 +3,6 @@ namespace App\Controller;
 
 use App\Enum\Role\UserRole;
 use App\Enum\Status\SystemStatus;
-use App\Repository\EventsRepository;
 use App\Service\MemberService;
 use Router\Response;
 use Router\Request;

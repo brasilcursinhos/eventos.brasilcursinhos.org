@@ -105,9 +105,10 @@ class FileManager
         array $allowedMimeTypes = [],
         int $maxSize = 2097152,
         ?string $relativePath = '',
+        bool $returnContent = false
     ): File {
         
-    $realMimeType = self::validateUpload($fileArray, $allowedMimeTypes, $maxSize);
+        $realMimeType = self::validateUpload($fileArray, $allowedMimeTypes, $maxSize);
 
         $originalName = basename($fileArray['name']);
         
@@ -159,6 +160,8 @@ class FileManager
 
         } else {
 
+            $fileContent = ($returnContent)? file_get_contents($fileArray['tmp_name']):null;
+
             if (!move_uploaded_file($fileArray['tmp_name'], $destinationPath)) {
                 throw new FileException(['save' => 'Falha ao mover o arquivo enviado para o diretório de destino.']);
             }
@@ -170,7 +173,8 @@ class FileManager
             path: $relativePath,
             mimeType: $realMimeType,
             size: (int) $fileArray['size'],
-            isEncrypted: $encrypt
+            isEncrypted: $encrypt,
+            content: $returnContent? $fileContent:null
         );
     }
 

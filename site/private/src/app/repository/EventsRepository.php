@@ -2,13 +2,17 @@
 namespace App\Repository;
 
 use App\Enum\Modality\EventModality;
+use App\Enum\Status\BcAccountTransactionStatus;
 use App\Enum\Status\EventRegistrationStatus;
 use App\Enum\Status\EventStatus;
+use App\Enum\Status\FinancialTransactionStatus;
 use App\Enum\Status\UserStatus;
 use App\Enum\Type\EventRegistrationType;
 use App\Enum\Type\EventTicketType;
 use App\Enum\Type\EventType;
+use App\Enum\Type\PaymentMethodType;
 use App\Enum\Type\UserType;
+use App\Model\BcAccountTransaction;
 use App\Model\EmergencyData;
 use App\Model\Event;
 use App\Model\EventRegistration;
@@ -218,7 +222,7 @@ class EventsRepository
         return $registration;
     }
 
-    public function saveFinancialTransaction(FinancialTransaction $transaction, File $file): FinancialTransaction
+    public function saveFinancialTransaction(FinancialTransaction $transaction, File $file, array $beneficiaries = []): FinancialTransaction
     {
         try {
             $this->pdo->beginTransaction();
@@ -258,11 +262,25 @@ class EventsRepository
 
             $transaction = $transaction->withId($this->pdo->lastInsertId());
 
-            $stmt3 = $this->pdo->prepare('UPDATE `EVENT_REGISTRATIONS` SET `status` = :status_, `updatedAt` = NOW() WHERE `idEventRegistration` = :idEventRegistration LIMIT 1');
-            $stmt3->bindValue(':status_', EventRegistrationStatus::PAYMENT_UNDER_REVIEW->value, PDO::PARAM_INT);
-            $stmt3->bindValue(':idEventRegistration', $transaction->registrationId, PDO::PARAM_INT);
+            if(!is_null($transaction->registrationId)) {
+                $stmt3 = $this->pdo->prepare('UPDATE `EVENT_REGISTRATIONS` SET `status` = :status_, `updatedAt` = NOW() WHERE `idEventRegistration` = :idEventRegistration LIMIT 1');
+                $stmt3->bindValue(':status_', EventRegistrationStatus::PAYMENT_UNDER_REVIEW->value, PDO::PARAM_INT);
+                $stmt3->bindValue(':idEventRegistration', $transaction->registrationId, PDO::PARAM_INT);
 
-            $stmt3->execute();
+                $stmt3->execute();
+            }
+            
+
+            if(!empty($beneficiaries)) {
+                $stmt4 = $this->pdo->prepare("INSERT INTO `TRANSACTION_BENEFICIARIES` (`idFinancialTransaction`, `idEventTicket`, `cpfHash`, `status`, `createdAt`) VALUES (:idFinancialTransaction, :idEventTicket, :cpfHash, :status_, NOW())");
+                $stmt4->bindValue(':idFinancialTransaction', $transaction->id, PDO::PARAM_INT);
+                $stmt4->bindValue(':status_', 1, PDO::PARAM_INT);
+                foreach($beneficiaries as $beneficiary) {
+                    $stmt4->bindValue(':idEventTicket', $beneficiary['ticket-id'], PDO::PARAM_INT);
+                    $stmt4->bindValue(':cpfHash', Crypto::hash($beneficiary['cpf']), PDO::PARAM_LOB);
+                    $stmt4->execute();
+                }
+            }
 
             $this->pdo->commit();
 
@@ -275,6 +293,87 @@ class EventsRepository
             Log::error('Erro ao salvar transação financeira.', 'database.log', $exception->getMessage());
 
             throw $exception;
+        }
+    }
+
+    /** @return FinancialTransaction[] */
+    public function getTransactions(bool $onlyPending = false): array
+    {
+        if($onlyPending) {
+            $stmt = $this->pdo->prepare("SELECT `idFinancialTransaction` AS `id`, `status`, `totalAmount`, `paymentMethod`, `idProofTransaction`, `providerTransactionId`, `idUser`, `idEvent`, `idEventRegistration` FROM `FINANCIAL_TRANSACTIONS` WHERE `status` = :status_");
+            $stmt->bindValue(':status_', FinancialTransactionStatus::UNDER_REVIEW->value, PDO::PARAM_INT);
+        } else {
+            $stmt = $this->pdo->prepare("SELECT `idFinancialTransaction` AS `id`, `status`, `totalAmount`, `paymentMethod`, `idProofTransaction`, `providerTransactionId`, `idUser`, `idEvent`, `idEventRegistration` FROM `FINANCIAL_TRANSACTIONS`");
+        }
+        $stmt->execute();
+        $result = $stmt->fetchAll();
+
+        $transactions = [];
+        if($result) {
+        
+            foreach($result as $row) {
+
+                if(!is_null($row->providerTransactionId)) {
+                    $userAAD = 'USER_ID_' . $row->idUser;
+                    $providerTransactionId = Crypto::decrypt($row->providerTransactionId, $userAAD);
+                } else {
+                    $providerTransactionId = null;
+                }
+                
+                $transactions[] = new FinancialTransaction(
+                    id: $row->id,
+                    status: FinancialTransactionStatus::tryFrom($row->status),
+                    paymentMethod: PaymentMethodType::tryFrom($row->paymentMethod),
+                    totalAmount: $row->totalAmount,
+                    userId: $row->idUser,
+                    eventId: $row->idEvent,
+                    registrationId: $row->idEventRegistration,
+                    idProofTransaction: $row->idProofTransaction,
+                    providerTransactionId: $providerTransactionId
+                );
+            }
+        }
+
+        return $transactions;
+    }
+
+    public function getBcAccountTransaction(?string $providerTransactionId): ?BcAccountTransaction
+    {
+        $transaction = null;
+
+        if(!is_null($providerTransactionId)) {
+            $stmt = $this->pdo->prepare("SELECT `idBcAccountTransaction` AS `id`, `transactionId`, `amount`, `datetime`, `status` FROM `BC_ACCOUNT_TRANSACTIONS` WHERE `transactionIdHash` = :transactionIdHash LIMIT 1");
+            $stmt->bindValue(':transactionIdHash', Crypto::hash($providerTransactionId), PDO::PARAM_LOB);
+            $stmt->execute();
+            $result = $stmt->fetch();
+            
+            
+            if($result) {
+            
+                $transaction = new BcAccountTransaction(
+                    id: $result->id,
+                    status: BcAccountTransactionStatus::tryFrom($result->status),
+                    amount: $result->amount,
+                    datetime: new DateTimeImmutable($result->datetime),
+                    transactionId: Crypto::decrypt($result->transactionId)
+                );
+            }
+        }
+        
+
+        return $transaction;
+    }
+
+    public function updateTransactionStatus(FinancialTransaction $transaction): bool
+    {
+        try {
+            $stmt = $this->pdo->prepare("UPDATE `FINANCIAL_TRANSACTIONS` SET `status` = :status_, `updatedAt` = NOW() WHERE `idFinancialTransaction` = :transactionId LIMIT 1");
+            $stmt->bindValue(':transactionId', $transaction->id, PDO::PARAM_INT);
+            $stmt->bindValue(':status_', $transaction->status->value, PDO::PARAM_INT);
+            $stmt->execute();
+            return true;
+        } catch(\Exception $e) {
+            return false;
         }
     }
 }

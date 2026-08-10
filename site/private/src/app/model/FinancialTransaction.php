@@ -34,4 +34,11 @@ class FinancialTransaction
             'idProofTransaction' => $idProofTransaction
         ]);
     }
+
+    public function updateStatus(FinancialTransactionStatus $status): self
+    {
+        return $this->copy([
+            'status' => $status
+        ]);
+    }
 }

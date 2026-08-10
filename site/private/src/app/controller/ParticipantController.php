@@ -91,8 +91,8 @@ class ParticipantController
 
     public function checkEncupRegistrationStatus(): Response
     {
-        //Session::delete('savePaymentProofStatusValue');
-        //Session::delete('saveRegistrationStatusValue');
+        Session::delete('savePaymentProofStatusValue');
+        Session::delete('saveRegistrationStatusValue');
 
         $event = $this->repository->getEvent(1);
         $user = Auth::user();

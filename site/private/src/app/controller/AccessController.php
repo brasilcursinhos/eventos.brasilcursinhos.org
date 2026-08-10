@@ -2,6 +2,7 @@
 namespace App\Controller;
 
 use App\Enum\Result\AuthResult;
+use App\Enum\Role\UserRole;
 use App\Enum\Status\SystemStatus;
 use App\Enum\Status\UserStatus;
 use App\Repository\AccessRepository;
@@ -221,6 +222,10 @@ class AccessController {
             $userId = $this->repository->saveRegistrationn($personalData);
         } catch (\Exception $exception) {
             throw new \UnexpectedValueException();
+        }
+
+        if(Auth::hasRole(UserRole::ADMINSTRATOR)) {
+            return Response::redirect("/cadastrar/sucesso", 303);
         }
 
         $code = Auth::getRandomCode(64);

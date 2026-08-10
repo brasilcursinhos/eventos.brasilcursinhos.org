@@ -14,7 +14,8 @@ class File
         public readonly int $size,
         public readonly bool $isEncrypted = false,
         public readonly ?int $id = null,
-        public readonly ?DateTimeImmutable $createdAt = null
+        public readonly ?DateTimeImmutable $createdAt = null,
+        public readonly ?string $content = null
     ) {
     }
 }

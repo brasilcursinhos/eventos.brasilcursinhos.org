@@ -137,7 +137,7 @@ CREATE TABLE IF NOT EXISTS `EVENTS` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 INSERT INTO `EVENTS`(`idEvent`, `title`, `edition`, `year`, `location`, `modality`, `type`, `status`, `registrationOpenAt`, `registrationCloseAt`, `socialRequestOpenAt`, `socialRequestCloseAt`, `createdAt`, `updatedAt`) VALUES 
-(1, 'ENCUP 2026', 11, '2026', 'FGV - São Paulo/SP', 1, 3, 2, '2026-07-10 00:00:00', '2026-08-10 23:59:59', '2026-07-10 00:00:00', '2026-07-31 23:59:59', NOW(), NOW());
+(1, 'ENCUP 2026', 11, '2026', 'FGV - São Paulo/SP', 1, 3, 2, '2026-07-10 00:00:00', '2026-08-09 23:59:59', '2026-07-10 00:00:00', '2026-07-31 23:59:59', NOW(), NOW());
 
 CREATE TABLE IF NOT EXISTS `EVENT_DATES` (
     `idEventDate` INT NOT NULL AUTO_INCREMENT,
@@ -332,6 +332,7 @@ CREATE TABLE IF NOT EXISTS `TRANSACTION_BENEFICIARIES` (
     `idFinancialTransaction` INT NULL DEFAULT NULL,
     `idEventTicket` INT NOT NULL,
 	`cpfHash` VARBINARY(64) NULL DEFAULT NULL,
+    `status` INT NOT NULL,
     `createdAt` DATETIME NOT NULL,
 	PRIMARY KEY (`idTransactionBeneficiary`),
     CONSTRAINT `fkTransactionBeneficiariesFinancialTransactions` FOREIGN KEY (`idFinancialTransaction`) REFERENCES `FINANCIAL_TRANSACTIONS`(`idFinancialTransaction`),

@@ -1,0 +1,44 @@
+{% extends "restricted/admin/base.html" %}
+
+{% block main2 %}
+    <h2 class="mt-3 mb-4 fw-bold">Registrar inscrição</h2>
+    <form action="/administrador/encup/inscricao" method="post">
+      {{ csrf_field() }}
+      <div class="row mb-3 me-3">
+        <div class="col-3">
+          <input type="text" class="form-control" id="cpf-registration" name="cpf" placeholder="Digite o CPF" required>
+        </div>
+        <div class="col-1">
+          <button type="submit" class="btn btn-secondary-bc"><strong>INSCRIÇÃO</strong></button>
+        </div>
+      </div>
+    </form>
+    <form action="/administrador/encup/pagamento" method="post">
+      {{ csrf_field() }}
+      <div class="row mb-3 me-3">
+        <div class="col-3">
+          <input type="text" class="form-control" id="cpf-payment" name="cpf" placeholder="Digite o CPF" required>
+        </div>
+        <div class="col-1">
+          <button type="submit" class="btn btn-secondary-bc"><strong>PAGAMENTO</strong></button>
+        </div>
+      </div>
+    </form>
+    <form action="/administrador/cadastro" method="post">
+      {{ csrf_field() }}
+      <div class="row mb-3 me-3">
+        <div class="col-3">
+          <input type="text" class="form-control" id="cpf-registration" name="cpf-registration" placeholder="Digite o CPF" required>
+        </div>
+        <div class="col-4">
+          <input type="email" class="form-control" id="email" name="email" autocomplete="off" placeholder="Digite o e-mail" required>
+        </div>
+        <div class="col-4">
+          <input type="email" class="form-control" id="email2" name="email2" autocomplete="off" placeholder="Confirme o e-mail" required>
+        </div>
+        <div class="col-1">
+          <button type="submit" class="btn btn-secondary-bc"><strong>CADASTRAR</strong></button>
+        </div>
+      </div>
+    </form>
+{% endblock main2 %}

@@ -118,6 +118,43 @@ class AdministratorController
         }
     }
 
+    public function showSocialRequestPage(Request $request, EventsRepository $repository): Response
+    {
+        $cpf = ValidatorService::validateCpf($request->__get('cpf'));
+        if($cpf) {
+            
+            $user = $this->repository->getUser($cpf);
+            if($user) {
+                $event = $repository->getEvent(1);
+                $registration = $repository->getEventRegistration($event, $user);
+                
+                if($registration?->status === EventRegistrationStatus::PENDING_PAYMENT) {
+                    $ticket = $repository->getEventTicket($registration->ticketId);
+                    //$amountForPix = number_format((float) $registration->amountDue, 2, '.', '');
+                    
+                    /*$payload = new StaticPayload();
+                    $payload->setPixKey(Parser::KEY_TYPE_EMAIL, 'financeiro@brasilcursinhos.org')
+                        ->setAmount($amountForPix)
+                        ->setTid('ENCUP2026'.$ticket->id)
+                        ->setDescription('Ingresso ' . strstr($ticket->name, '-', true) . $ticket->type->label())
+                        ->setMerchantName('Brasil Cursinhos')
+                        ->setMerchantCity('Sao Paulo');
+                    $pixCode = $payload->getPixCode();
+                    $pixQRCode = $payload->getQRCode();*/
+                    return Response::html('@participant/encup/social-request.html', [ 'links' => $this->links, 
+                        'user' => $user, 'ticket' => $ticket, 'registration' => $registration, 'event' => $event])->withoutCache();
+                } else {
+                    return Response::html('@admin/payment-existence.html', [ 'links' => $this->links])->withoutCache();
+                }
+            }else {
+                return Response::html('@admin/user-404.html', [ 'links' => $this->links])->withoutCache();
+            }
+            
+        }else {
+            return Response::html('@admin/invalid-cpf.html', [ 'links' => $this->links])->withoutCache();
+        }
+    }
+
     public function showRegistrationPage(Request $request, EventsRepository $repository): Response
     {
         $cpf = ValidatorService::validateCpf($request->__get('cpf'));
@@ -198,6 +235,15 @@ class AdministratorController
         }
         
         return Response::redirect('/administrador/transacoes/pendentes', 303);
+    }
+
+    public function saveSocialRequest(Request $request, EventsService $service): Response
+    {
+        $result = $service->saveSocialRequest($request);
+        
+        var_dump($result);
+        echo "<br><a href='/administrador/encup'>Voltar</a>";
+        exit;
     }
 
 }

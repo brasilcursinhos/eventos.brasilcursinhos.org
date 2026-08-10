@@ -8,7 +8,7 @@
         <div class="col-3">
           <input type="text" class="form-control" id="cpf-registration" name="cpf" placeholder="Digite o CPF" required>
         </div>
-        <div class="col-1">
+        <div class="col-2">
           <button type="submit" class="btn btn-secondary-bc"><strong>INSCRIÇÃO</strong></button>
         </div>
       </div>
@@ -19,8 +19,19 @@
         <div class="col-3">
           <input type="text" class="form-control" id="cpf-payment" name="cpf" placeholder="Digite o CPF" required>
         </div>
-        <div class="col-1">
+        <div class="col-2">
           <button type="submit" class="btn btn-secondary-bc"><strong>PAGAMENTO</strong></button>
+        </div>
+      </div>
+    </form>
+    <form action="/administrador/encup/lote-social" method="post">
+      {{ csrf_field() }}
+      <div class="row mb-3 me-3">
+        <div class="col-3">
+          <input type="text" class="form-control" id="cpf-social-request" name="cpf" placeholder="Digite o CPF" required>
+        </div>
+        <div class="col-2">
+          <button type="submit" class="btn btn-secondary-bc"><strong>LOTE SOCIAL</strong></button>
         </div>
       </div>
     </form>

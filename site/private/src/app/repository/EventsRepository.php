@@ -20,6 +20,7 @@ use App\Model\EventTicket;
 use App\Model\File;
 use App\Model\FinancialTransaction;
 use App\Model\PersonalData;
+use App\Model\SocialDiscountRequest;
 use App\Model\User;
 use App\Util\Log;
 use App\Util\Crypto;
@@ -281,6 +282,53 @@ class EventsRepository
                     $stmt4->execute();
                 }
             }
+
+            $this->pdo->commit();
+
+            return $transaction;
+
+        } catch (\Exception $exception) {
+
+            $this->pdo->rollBack();
+
+            Log::error('Erro ao salvar transação financeira.', 'database.log', $exception->getMessage());
+
+            throw $exception;
+        }
+    }
+
+    public function saveSocialRequest(SocialDiscountRequest $transaction, File $file): SocialDiscountRequest
+    {
+        try {
+            $this->pdo->beginTransaction();
+
+            $stmt = $this->pdo->prepare("INSERT INTO `FILES` (`originalName`, `storedName`, `path`, `mimeType`, `size`, `isEncrypted`, `createdAt`) VALUES (:originalName, :storedName, :path_, :mimeType, :size_, :isEncrypted, NOW())");
+            $stmt->bindValue(':originalName', $file->originalName, PDO::PARAM_STR);
+            $stmt->bindValue(':storedName', $file->storedName, PDO::PARAM_STR);
+            $stmt->bindValue(':path_', $file->path, PDO::PARAM_STR);
+            $stmt->bindValue(':mimeType', $file->mimeType, PDO::PARAM_STR);
+            $stmt->bindValue(':size_', $file->size, PDO::PARAM_INT);
+            $stmt->bindValue(':isEncrypted', $file->isEncrypted, PDO::PARAM_BOOL);
+            $stmt->execute();
+            
+            $transaction = $transaction->withProofRequest((int)$this->pdo->lastInsertId());
+
+            $stmt2 = $this->pdo->prepare('INSERT INTO `SOCIAL_DISCOUNT_REQUESTS` (`status`, `idProofRequest`, `idEventTicket`, `idEventRegistration`, `createdAt`, `updatedAt` ) VALUES ( :status_, :idProofRequest, :idEventTicket, :idEventRegistration, NOW(), NOW())');
+            
+            $stmt2->bindValue(':status_', $transaction->status->value, PDO::PARAM_INT);
+            $stmt2->bindValue(':idProofRequest', $transaction->idProofRequest, PDO::PARAM_INT);
+            $stmt2->bindValue(':idEventTicket', $transaction->ticketId, PDO::PARAM_INT);
+            $stmt2->bindValue(':idEventRegistration', $transaction->registrationId, PDO::PARAM_INT);
+
+            $stmt2->execute();
+
+            $transaction = $transaction->withId($this->pdo->lastInsertId());
+
+            $stmt3 = $this->pdo->prepare('UPDATE `EVENT_REGISTRATIONS` SET `status` = :status_, `updatedAt` = NOW() WHERE `idEventRegistration` = :idEventRegistration LIMIT 1');
+            $stmt3->bindValue(':status_', EventRegistrationStatus::AWAITING_SOCIAL_ANALYSIS->value, PDO::PARAM_INT);
+            $stmt3->bindValue(':idEventRegistration', $transaction->registrationId, PDO::PARAM_INT);
+
+            $stmt3->execute();
 
             $this->pdo->commit();
 

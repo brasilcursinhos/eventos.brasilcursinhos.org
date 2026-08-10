@@ -4,6 +4,7 @@ namespace App\Service;
 use App\Enum\Role\UserRole;
 use App\Enum\Status\EventRegistrationStatus;
 use App\Enum\Status\FinancialTransactionStatus;
+use App\Enum\Status\SocialDiscountRequestStatus;
 use App\Enum\Status\SystemStatus;
 use App\Enum\Type\PaymentMethodType;
 use App\Exception\FileException;
@@ -11,6 +12,7 @@ use App\Exception\ValidationException;
 use App\Model\Result;
 use App\Model\Event;
 use App\Model\FinancialTransaction;
+use App\Model\SocialDiscountRequest;
 use App\Repository\AdministratorRepository;
 use App\Repository\EventsRepository;
 use App\Repository\FileRepository;
@@ -310,6 +312,83 @@ class EventsService
                 providerTransactionId: $providerTransactionId
             );
             $transaction = $this->repository->saveFinancialTransaction($transaction, $file, $beneficiaries);
+        } catch(FileException $exception) {
+            return Result::failure(SystemStatus::FILE_ERROR);
+        } catch(PDOException $exception) {
+            return Result::failure(SystemStatus::DATABASE_ERROR);
+        }
+
+        // comprovante recebido
+
+        return Result::success();
+    }
+
+    public function saveSocialRequest(Request $request): Result
+    {
+        try {
+            $userId = ValidatorService::validateInt($request->__get('user-id'));
+            $eventId = ValidatorService::validateInt($request->__get('event-id'));
+            
+            if(!$userId) {
+                throw new ValidationException(['user-id' => 'ID do usuário não informado.']);
+            }
+
+            if(!$eventId) {
+                throw new ValidationException(['event-id' => 'ID do evento não informado.']);
+            }
+
+            $user = Auth::user();
+
+            if($user->id !== $userId ) {
+                if(Auth::hasRole(UserRole::ADMINSTRATOR)) {
+                    $user = $this->repository->getUser($userId);
+                } else {
+                    throw new RouteForbidden();
+                }
+            }
+
+            if(is_null($user)) {
+                throw new ValidationException(['user-id' => 'O usuário é inválido ou inexistente.']);
+            }
+            
+            $event = $this->repository->getEvent($eventId);
+
+            if(is_null($event)) {
+                throw new ValidationException(['event-id' => 'O evento é inválido ou inexistente.']);
+            }
+
+            $registration = $this->repository->getEventRegistration($event, $user);
+
+            if(is_null($registration)) {
+                throw new ValidationException(['registration' => 'Inscrição no evento não encontrata.']);
+            }
+            
+        } catch(ValidationException $exception) {
+            return Result::failure(SystemStatus::VALIDATION_ERROR, $exception->getMessage(), $exception->getErrors());
+        } catch(PDOException $exception) {
+            return Result::failure(SystemStatus::DATABASE_ERROR);
+        }
+
+        try {
+            $userAAD = 'USER_ID_' . $user->id;
+            $file = FileManager::saveUpload(
+                fileArray: $request->file('payment-proof'),
+                encrypt: true,
+                encryptionAAD: $userAAD,
+                allowedMimeTypes: ['application/pdf', 'image/*'],
+                relativePath: 'encup/2026',
+                returnContent: true
+            );
+            //$pixIdExtractor = new PixIdExtractorService();
+            //$providerTransactionId = $pixIdExtractor->extractE2eId($file->content, $file->mimeType);
+            $transaction = new SocialDiscountRequest(
+                id: null,
+                status: SocialDiscountRequestStatus::UNDER_REVIEW,
+                ticketId: $registration->ticketId,
+                registrationId: $registration->id,
+                idProofRequest: null
+            );
+            $transaction = $this->repository->saveSocialRequest($transaction, $file);
         } catch(FileException $exception) {
             return Result::failure(SystemStatus::FILE_ERROR);
         } catch(PDOException $exception) {

@@ -68,4 +68,14 @@ return function(\Router\Router $router)
         'set' => '/administrador/transacoes',
         'roles' => [UserRole::ADMINSTRATOR]
     ], 'AdministratorController@updateTransactionId');
+
+    $router->post([
+        'set' => '/administrador/encup/lote-social',
+        'roles' => [UserRole::ADMINSTRATOR]
+    ], 'AdministratorController@showSocialRequestPage');
+
+    $router->post([
+        'set' => '/administrador/encup/lote-social/save',
+        'roles' => [UserRole::ADMINSTRATOR]
+    ], 'AdministratorController@saveSocialRequest');
 };

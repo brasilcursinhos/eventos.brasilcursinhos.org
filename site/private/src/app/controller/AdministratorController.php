@@ -165,9 +165,9 @@ class AdministratorController
         exit;
     }
 
-    public function showTransactionsPage(EventsRepository $repository): Response
+    public function showTransactionsPage(EventsRepository $repository, ?string $code = null): Response
     {
-        $transactions = $repository->getTransactions(true);
+        $transactions = $repository->getTransactions(is_null($code)? false:true);
         return Response::html('@admin/transactions.html', [ 'links' => $this->links, 'transactions' => $transactions])->withoutCache();
     }
 

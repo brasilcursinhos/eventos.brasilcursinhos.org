@@ -55,6 +55,11 @@ return function(\Router\Router $router)
     ], 'AdministratorController@showTransactionsPage');
 
     $router->get([
+        'set' => '/administrador/transacoes/{code}',
+        'roles' => [UserRole::ADMINSTRATOR]
+    ], 'AdministratorController@showTransactionsPage');
+
+    $router->get([
         'set' => '/administrador/conciliar-transacoes',
         'roles' => [UserRole::ADMINSTRATOR]
     ], 'AdministratorController@reconcileTransactions');

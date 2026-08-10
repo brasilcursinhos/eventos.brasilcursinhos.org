@@ -4,6 +4,6 @@
     <h2 class="mt-3 mb-4 fw-bold">Lista de transaçoes</h2>
     <a href="/administrador/conciliar-transacoes">Conciliar Transacoes</a>
     {% for transaction in transactions %}
-      <p>{{transaction.id}} - {{transaction.justification}} - {{transaction.status.name}}</p>
+    <p>{{transaction.id}} - {{transaction.status.name}} - {{transaction.providerTransactionId}}</p>
     {% endfor %}
 {% endblock main2 %}

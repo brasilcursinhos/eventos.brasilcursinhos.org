@@ -7,8 +7,8 @@
 
 {% block head %}
 <title>Administração - Eventos Brasil Cursinhos</title>
-<meta name="keywords" content="Cursinho PES; UFSC; Curso pré-vestibular; Projeto Educação Solidária; Araranguá">
-<meta name="description" content="Página com informações sobre o Processo Seletivo de {{department | title}} do Cursinho PES.">
+<meta name="keywords" content="Brasil Cursinhos; Eventos">
+<meta name="description" content="Área do administrador da Brasil Cursinhos.">
 <meta name="robots" content="index, follow">
 {% block head2 %}{% endblock head2 %}
 {% endblock head %}
@@ -25,11 +25,9 @@
         {% endfor %}
       </div>
     </aside>
-    <div class="col-md-9 ms-sm-auto col-lg-9 col-xl-80 main-content d-flex flex-column overflow-y">
+    <div class="col-md-9 col-lg-9 col-xl-80 main-content d-flex flex-column overflow-y">
       <main class="px-4">
-        <div class="container-fluid">
-            {% block main2 %}{% endblock main2 %}
-        </div>
+        {% block main2 %}{% endblock main2 %}
       </main>
     </div>
   </div>

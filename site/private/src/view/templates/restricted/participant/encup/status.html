@@ -16,6 +16,7 @@
     <p><strong>STATUS DA INSCRIÇÃO:</strong> {{registration.status.label}}</p>
   </div>
 </div>
+{% if has_role(ROLES.ADMIN) %}<p><a href="/administrador/encup">Voltar</a></p>{% endif %}
 {% endblock main2 %}
 
 {% block scriptsJS %}

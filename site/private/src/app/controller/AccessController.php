@@ -225,6 +225,7 @@ class AccessController {
         }
 
         if(Auth::hasRole(UserRole::ADMINSTRATOR)) {
+            Session::set("lastCpf", $personalData->cpf);
             return Response::redirect("/cadastrar/sucesso", 303);
         }
 

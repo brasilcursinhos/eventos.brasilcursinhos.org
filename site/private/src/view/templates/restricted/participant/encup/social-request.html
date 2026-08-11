@@ -10,7 +10,11 @@
     <p class="mb-1">Seu comprovante de pagamento da inscrição foi salvo com sucesso.</p>
     <p class="mb-1">Quando o seu pagamento for processado em até 72h você receberá um e-mail de confirmação.</p>
     <p class="mb-5">Você pode retornar ao site a qualquer momento para consultar o status da sua inscrição.</p>
+    {% if has_role(ROLES.ADMIN) %}
+    <a class="btn btn-secondary-bc w-auto px-3 text-decoration-none" href="/administrador/encup"><strong>Conferir status da inscrição</strong></a>
+    {% else %}
     <a class="btn btn-secondary-bc w-auto px-3 text-decoration-none" href="/participante/encup"><strong>Conferir status da inscrição</strong></a>
+    {% endif %}
   </div>
   {% else %}
   <div class="row my-5 justify-content-center text-center">
@@ -18,7 +22,11 @@
     <p>Houve um erro ao salvar seu comprovante de pagamento da inscrição.</p>
     <p><strong>ERRO:</strong> {{savePaymentProofStatus.label}}</p>
     <p class="mb-5">Tente enviar o comprovante novamente, se o erro persistir <a href="/contato" target="_blank"><strong>entre em contato com o suporte</strong></a>.</p>
+    {% if has_role(ROLES.ADMIN) %}
+    <a class="btn btn-secondary-bc w-auto px-3 text-decoration-none" href="/administrador/encup"><strong>Tentar novamente</strong></a>
+    {% else %}
     <a class="btn btn-secondary-bc w-auto px-3 text-decoration-none" href="/participante/encup"><strong>Tentar novamente</strong></a>
+    {% endif %}
   </div>
   {% endif %}
 {% else %}

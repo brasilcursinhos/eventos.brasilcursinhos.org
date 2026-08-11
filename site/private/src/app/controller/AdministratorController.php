@@ -9,6 +9,7 @@ use App\Repository\EventsRepository;
 use App\Service\EventsService;
 use App\Service\ValidatorService;
 use App\Util\Auth;
+use App\Util\Session;
 use Router\Request;
 use Router\Response;
 
@@ -77,7 +78,8 @@ class AdministratorController
 
     public function showEncupPage(): Response
     {
-        return Response::html('@admin/registration.html', ['user' => Auth::user(), 'links' => $this->links])->withoutCache();
+        $lastCpf = Session::get('lastCpf');
+        return Response::html('@admin/registration.html', ['user' => Auth::user(), 'links' => $this->links, 'lastCpf' => $lastCpf])->withoutCache();
     }
 
     public function showPaymentPage(Request $request, EventsRepository $repository): Response
@@ -87,6 +89,7 @@ class AdministratorController
             
             $user = $this->repository->getUser($cpf);
             if($user) {
+                Session::set('lastCpf', $cpf);
                 $event = $repository->getEvent(1);
                 $registration = $repository->getEventRegistration($event, $user);
                 
@@ -125,6 +128,7 @@ class AdministratorController
             
             $user = $this->repository->getUser($cpf);
             if($user) {
+                Session::set('lastCpf', $cpf);
                 $event = $repository->getEvent(1);
                 $registration = $repository->getEventRegistration($event, $user);
                 
@@ -163,6 +167,7 @@ class AdministratorController
             $user = $this->repository->getUser($cpf);
 
             if($user) {
+                Session::set('lastCpf', $cpf);
                 $event = $repository->getEvent(1);
                 $registration = $repository->getEventRegistration($event, $user);
 
@@ -175,6 +180,38 @@ class AdministratorController
                     ])->withoutCache();
                 } else {
                     return Response::html('@admin/registration-existence.html', [ 'links' => $this->links])->withoutCache();
+                }
+            }else {
+                return Response::html('@admin/user-404.html', [ 'links' => $this->links])->withoutCache();
+            }
+            
+        }else {
+            return Response::html('@admin/invalid-cpf.html', [ 'links' => $this->links])->withoutCache();
+        }
+        
+    }
+
+    public function showStatusPage(Request $request, EventsRepository $repository): Response
+    {
+        $cpf = ValidatorService::validateCpf($request->__get('cpf'));
+        if($cpf) {
+            
+            $user = $this->repository->getUser($cpf);
+
+            if($user) {
+                Session::set('lastCpf', $cpf);
+                $event = $repository->getEvent(1);
+                $registration = $repository->getEventRegistration($event, $user);
+
+                if(!is_null($registration)) {
+
+                    $ticket = $repository->getEventTicket($registration->ticketId);
+
+                    return Response::html('@participant/encup/status.html', [ 'links' => $this->links, 
+                        'user' => $user, 'ticket' => $ticket, 'registration' => $registration, 'event' => $event
+                    ])->withoutCache();
+                } else {
+                    return Response::html('@admin/registration-404.html', [ 'links' => $this->links])->withoutCache();
                 }
             }else {
                 return Response::html('@admin/user-404.html', [ 'links' => $this->links])->withoutCache();

@@ -75,6 +75,11 @@ return function(\Router\Router $router)
     ], 'AdministratorController@showSocialRequestPage');
 
     $router->post([
+        'set' => '/administrador/encup/status',
+        'roles' => [UserRole::ADMINSTRATOR]
+    ], 'AdministratorController@showStatusPage');
+
+    $router->post([
         'set' => '/administrador/encup/lote-social/save',
         'roles' => [UserRole::ADMINSTRATOR]
     ], 'AdministratorController@saveSocialRequest');

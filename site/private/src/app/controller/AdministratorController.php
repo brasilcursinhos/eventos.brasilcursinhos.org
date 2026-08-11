@@ -6,9 +6,11 @@ use App\Enum\Status\EventRegistrationStatus;
 use App\Enum\Status\FinancialTransactionStatus;
 use App\Repository\AdministratorRepository;
 use App\Repository\EventsRepository;
+use App\Repository\FileRepository;
 use App\Service\EventsService;
 use App\Service\ValidatorService;
 use App\Util\Auth;
+use App\Util\FileManager;
 use App\Util\Session;
 use Router\Request;
 use Router\Response;
@@ -281,6 +283,21 @@ class AdministratorController
         var_dump($result);
         echo "<br><a href='/administrador/encup'>Voltar</a>";
         exit;
+    }
+
+    public function showProof(Request $request, FileRepository $repository): Response
+    {
+        $fileId = ValidatorService::validateInt($request->__get('file-id'));
+        $userId = ValidatorService::validateInt($request->__get('user-id'));
+        if(!$fileId || !$userId) {
+            throw new \Router\Exception\RouteNotFound();
+        }
+        $file = $repository->getFile($fileId);
+        if(is_null($file)) {
+            throw new \Router\Exception\RouteNotFound();
+        }
+        $content = FileManager::readFromDisk($file, 'USER_ID_'.$userId);
+        return Response::file($content, $file->originalName, $file->mimeType);
     }
 
 }

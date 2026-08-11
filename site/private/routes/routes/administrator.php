@@ -80,6 +80,11 @@ return function(\Router\Router $router)
     ], 'AdministratorController@showStatusPage');
 
     $router->post([
+        'set' => '/administrador/encup/comprovante',
+        'roles' => [UserRole::ADMINSTRATOR]
+    ], 'AdministratorController@showProof');
+
+    $router->post([
         'set' => '/administrador/encup/lote-social/save',
         'roles' => [UserRole::ADMINSTRATOR]
     ], 'AdministratorController@saveSocialRequest');

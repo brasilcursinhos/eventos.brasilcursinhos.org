@@ -4,24 +4,37 @@
     <h2 class="mt-3 mb-4 fw-bold">Lista de transaçoes</h2>
     <p><a href="/administrador/conciliar-transacoes">Conciliar Transacoes</a></p>
     {% for transaction in transactions %}
-    <form action="/administrador/transacoes" method="post">
-      {{ csrf_field() }}
-      <input type="hidden" name="user-id" value="{{transaction.userId}}">
-      <input type="hidden" name="transaction-id" value="{{transaction.id}}">
-      <div class="row mb-2">
-        <div class="col-auto">
-          {{'%03d'|format(transaction.id)}}
-        </div>
-        <div class="col-2">
-          {{transaction.status.name}}
-        </div>
-        <div class="col-6">
-          <input type="text" class="form-control" name="provider-id" value="{{transaction.providerTransactionId}}" required>
-        </div>
-        <div class="col-1">
-          <button type="submit" class="btn btn-secondary-bc">SALVAR</button>
-        </div>
+    <div class="row">
+      <div class="col-9">
+        <form action="/administrador/transacoes" method="post">
+          {{ csrf_field() }}
+          <input type="hidden" name="user-id" value="{{transaction.userId}}">
+          <input type="hidden" name="transaction-id" value="{{transaction.id}}">
+          <div class="row mb-2">
+            <div class="col-auto">
+              {{'%03d'|format(transaction.id)}}
+            </div>
+            <div class="col-3 col-lg-2">
+              {{transaction.status.name}}
+            </div>
+            <div class="col">
+              <input type="text" class="form-control" name="provider-id" value="{{transaction.providerTransactionId}}" required>
+            </div>
+            <div class="col-auto">
+              <button type="submit" class="btn btn-secondary-bc">SALVAR</button>
+            </div>
+          </div>
+        </form>
       </div>
-    </form>
+      <div class="col-3">
+        <form action="/administrador/encup/comprovante" target="_blank" method="post">
+          {{ csrf_field() }}
+          <input type="hidden" name="user-id" value="{{transaction.userId}}">
+          <input type="hidden" name="file-id" value="{{transaction.idProofTransaction}}">
+          <button type="submit" class="btn btn-secondary-bc">COMPROVANTE</button>
+        </form>
+      </div>
+    </div>
+    
     {% endfor %}
 {% endblock main2 %}

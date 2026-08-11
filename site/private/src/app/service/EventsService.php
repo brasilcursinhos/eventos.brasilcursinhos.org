@@ -79,7 +79,9 @@ class EventsService
         }
 
         if(!$event->canAcceptRegistrations()) {
-            return Result::failure(SystemStatus::REGISTRATION_DATE_ERROR);
+            if(!Auth::hasRole(UserRole::ADMINSTRATOR)) {
+                return Result::failure(SystemStatus::REGISTRATION_DATE_ERROR);
+            }
         }
 
         if(!is_null($this->repository->getEventRegistration($event, $user))) {
@@ -108,6 +110,7 @@ class EventsService
         $registration = $registration->updatePrices($ticket->price, $ticket->price);
         if(bccomp('0.00', $ticket->price) === 0) {
             $registration = $registration->updateStatus(EventRegistrationStatus::CONFIRMED);
+            // email de confirmação
         }
         
         $attemptsInsert = 0;

@@ -13,7 +13,7 @@
     //ini_set('session.save_path', 'memcached:11211');
     ini_set('session.save_handler', 'files');
     ini_set('session.save_path', realpath(DIR_SESSIONS));
-    ini_set('session.serialize_handler', 'igbinary');
+    ini_set('session.serialize_handler', 'php_serialize');
     ini_set('session.cache_limiter', 'nocache');
     ini_set('session.gc_probability', 0);
     ini_set('session.gc_maxlifetime', 14400);

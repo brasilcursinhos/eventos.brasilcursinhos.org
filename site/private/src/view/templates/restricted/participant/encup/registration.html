@@ -30,7 +30,7 @@
   </div>
   {% endif %}
 {% else %}
-  {% if event.canAcceptRegistrations() or exceptionalRegistration %}
+  {% if event.canAcceptRegistrations() or exceptionalRegistration or has_role(ROLES.ADMIN) %}
     <form action="/participante/encup/inscricao" method="post" enctype="multipart/form-data" id="form-encup-registration">
       <section id="start">
         <input type="hidden" name="user-id" value="{{user.id}}">

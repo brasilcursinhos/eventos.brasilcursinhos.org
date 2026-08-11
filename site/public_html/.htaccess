@@ -131,3 +131,10 @@ ErrorDocument 502 /erro/502
 ErrorDocument 503 /erro/503
 ErrorDocument 504 /erro/504
 ErrorDocument 505 /erro/505
+
+# php -- BEGIN cPanel-generated handler, do not edit
+# Defina o pacote “ea-php85” como a linguagem padrão de programação “PHP”.
+<IfModule mime_module>
+  AddHandler application/x-httpd-ea-php85___lsphp .php .php8 .phtml
+</IfModule>
+# php -- END cPanel-generated handler, do not edit

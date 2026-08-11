@@ -6,6 +6,8 @@ site/private/src/view/emails/cache/*
 site/private/config/*local*
 *tests/*
 *.log
+*error_log
+*.ftpquota
 database/*.sql
 !database/dump.sql
 site/public_html/documentos/*

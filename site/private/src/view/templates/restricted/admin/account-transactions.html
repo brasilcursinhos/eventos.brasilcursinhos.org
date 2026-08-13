@@ -4,6 +4,6 @@
     <h2 class="mt-3 mb-4 fw-bold">Lista de transaçoes</h2>
     <p><a href="/administrador/conciliar-transacoes">Conciliar Transacoes</a></p>
     {% for transaction in transactions %}
-    <p>{{'%03d'|format(transaction.id)}} - {{transaction.status.name}} - {{transaction.datetime|date('d/m/Y H:i:s')}} - {{transaction.transactionId}}</p>
+    <p>{{'%03d'|format(transaction.id)}} - {{transaction.status.name}} - {{transaction.datetime|date('d/m/Y H:i:s')}} | R$ {{transaction.amount}} – {{transaction.transactionId}}</p>
     {% endfor %}
 {% endblock main2 %}

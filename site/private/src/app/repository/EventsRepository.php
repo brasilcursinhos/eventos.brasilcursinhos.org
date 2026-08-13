@@ -385,6 +385,38 @@ class EventsRepository
         return $transactions;
     }
 
+    /** @return BcAccountTransaction[] */
+    public function getAccountTransactions(bool $onlyPending = false): array
+    {
+        if($onlyPending) {
+            $stmt = $this->pdo->prepare("SELECT `idBcAccountTransaction` AS `id`, `transactionId`, `amount`, `datetime`, `status` FROM `BC_ACCOUNT_TRANSACTIONS` WHERE `status` = :status_ ORDER BY `datetime` ASC");
+            $stmt->bindValue(':status_', BcAccountTransactionStatus::PENDING->value, PDO::PARAM_INT);
+        } else {
+            $stmt = $this->pdo->prepare("SELECT `idBcAccountTransaction` AS `id`, `transactionId`, `amount`, `datetime`, `status` FROM `BC_ACCOUNT_TRANSACTIONS` ORDER BY `datetime` ASC");
+        }
+        $stmt->execute();
+        $result = $stmt->fetchAll();
+
+        $transactions = [];
+        if($result) {
+        
+            foreach($result as $row) {
+
+                $transactionId = Crypto::decrypt($row->transactionId);
+                
+                $transactions[] = new BcAccountTransaction(
+                    id: $row->id,
+                    transactionId: $transactionId,
+                    amount: $row->amount,
+                    datetime: new DateTimeImmutable($row->datetime),
+                    status: BcAccountTransactionStatus::tryFrom($row->status),
+                );
+            }
+        }
+
+        return $transactions;
+    }
+
     public function getBcAccountTransaction(?string $providerTransactionId): ?BcAccountTransaction
     {
         $transaction = null;

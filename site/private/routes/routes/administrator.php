@@ -50,6 +50,16 @@ return function(\Router\Router $router)
     ], 'AdministratorController@saveBatchPayment');
 
     $router->get([
+        'set' => '/administrador/transacoes-conta',
+        'roles' => [UserRole::ADMINSTRATOR]
+    ], 'AdministratorController@showAccountTransactionsPage');
+
+    $router->get([
+        'set' => '/administrador/transacoes-conta/{code}',
+        'roles' => [UserRole::ADMINSTRATOR]
+    ], 'AdministratorController@showAccountTransactionsPage');
+
+    $router->get([
         'set' => '/administrador/transacoes',
         'roles' => [UserRole::ADMINSTRATOR]
     ], 'AdministratorController@showTransactionsPage');

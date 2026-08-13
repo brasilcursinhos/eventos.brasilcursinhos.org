@@ -28,6 +28,7 @@ class AdministratorController
             (object) array('name' => 'Página inicial', 'url' => '/administrador'),
             (object) array('name' => 'Cadastrar inscrição', 'url' => '/administrador/encup'),
             (object) array('name' => 'Conferir transações', 'url' => '/administrador/transacoes'),
+            (object) array('name' => 'Transações da conta', 'url' => '/administrador/transacoes-conta')
         );
 
         if(Auth::hasRole(UserRole::BC_MEMBER)) {
@@ -245,6 +246,12 @@ class AdministratorController
     {
         $transactions = $repository->getTransactions(is_null($code)? false:true);
         return Response::html('@admin/transactions.html', [ 'links' => $this->links, 'transactions' => $transactions])->withoutCache();
+    }
+
+    public function showAccountTransactionsPage(EventsRepository $repository, ?string $code = null): Response
+    {
+        $transactions = $repository->getAccountTransactions(is_null($code)? false:true);
+        return Response::html('@admin/account-transactions.html', [ 'links' => $this->links, 'transactions' => $transactions])->withoutCache();
     }
 
     public function reconcileTransactions(EventsRepository $repository): Response

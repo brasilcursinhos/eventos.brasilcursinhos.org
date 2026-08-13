@@ -4,6 +4,9 @@ namespace App\Controller;
 use App\Enum\Role\UserRole;
 use App\Enum\Status\EventRegistrationStatus;
 use App\Enum\Status\FinancialTransactionStatus;
+use App\Enum\Type\EventRegistrationType;
+use App\Model\EmergencyData;
+use App\Model\EventRegistration;
 use App\Model\PersonalData;
 use App\Repository\AccessRepository;
 use App\Repository\AdministratorRepository;
@@ -15,8 +18,10 @@ use App\Util\Auth;
 use App\Util\FileManager;
 use App\Util\Log;
 use App\Util\Session;
+use Google\Type\PhoneNumber;
 use Router\Request;
 use Router\Response;
+use App\Model\Event;
 
 class AdministratorController
 {
@@ -358,7 +363,7 @@ class AdministratorController
                 pronouns: [$data['pronouns']],
                 genderIdentity: $data['genderIdentify'],
                 ethnicity: $data['ethnicity'],
-                cpf: $data['cpf'],
+                cpf: $cpf,
                 birthDate: new \DateTimeImmutable($data['birthDate']),
                 email: $data['email'],
                 phone: $data['phone'],
@@ -382,5 +387,153 @@ class AdministratorController
         echo "Sucesso";exit;
 
         return Response::empty();
+    }
+
+    public function fixCpf(AdministratorRepository $repo)
+    {
+        $users = $repo->getAllUsers();
+        foreach($users as $user) {
+            try {
+                $repo->updateUserCpf(ValidatorService::validateCpf($user->personalData->cpf), $user->id);
+            } catch(\Exception $e) {
+                continue;
+            }
+        }
+        echo "sucesso";
+        exit;
+    }
+
+    public function insertRegistrations(EventsRepository $erepo, AdministratorRepository $arepo): Response
+    {
+        $filePath = __DIR__ . '/registration.csv';
+
+        if (!file_exists($filePath)) {
+            throw new \RuntimeException("O arquivo CSV não foi encontrado: {$filePath}");
+        }
+
+        $handle = fopen($filePath, 'r');
+        if ($handle === false) {
+            throw new \RuntimeException("Não foi possível abrir o arquivo CSV: {$filePath}");
+        }
+
+        // Lê a primeira linha (cabeçalhos)
+        $headers = fgetcsv($handle, 0, ';', '"', '\\');
+        
+        // Remove o BOM (Byte Order Mark) do primeiro cabeçalho, comum em arquivos exportados do Windows/Excel
+        if ($headers !== false) {
+            $headers[0] = preg_replace('/^[\xef\xbb\xbf]+/', '', $headers[0]);
+        }
+
+
+        // Lê as linhas subsequentes
+        while (($row = fgetcsv($handle, 0, ';', '"', '\\')) !== false) {
+            // Ignora linhas totalmente vazias
+            if (empty(array_filter($row))) {
+                continue;
+            }
+
+            // Mapeia a linha atual com as chaves do cabeçalho
+            $data = array_combine($headers, $row);
+
+            $cpf = ValidatorService::validateCpf($data['cpf']);
+            $ticketId = ValidatorService::validateInt($data['ticketId']);
+
+            if(!$cpf) {
+                Log::error('CPF inválido no id: '.$data['cpf'], 'registrations-errors.log');
+                continue;
+            }
+
+            $ticket = $erepo->getEventTicket($ticketId);
+            $user = $arepo->getUser($cpf);
+            $event = $erepo->getEvent(1);
+
+            if(is_null($ticket) || is_null($user) || is_null($event)) {
+                Log::error('Erro ao recuperar dados iniciais: '.$cpf, 'registrations-errors.log');
+                continue;
+            }
+
+            if(!is_null($erepo->getEventRegistration($event, $user))) {
+                Log::error('Inscrição existente: '.$cpf, 'registrations-errors.log');
+                continue;
+            }
+
+            $emergencyData = new EmergencyData(
+                name: 'Alguém',
+                kinship: 'Outro',
+                phone: '12345678901'
+            );
+
+            $registration = new EventRegistration(
+                id: null,
+                registration: null,
+                type: ($data['type'] == 'filiado')? EventRegistrationType::AFFILIATED_CUP_MEMBER:EventRegistrationType::UNAFFILIATED_CUP_MEMBER,
+                status: EventRegistrationStatus::PENDING_PAYMENT,
+                basePrice: $ticket->price,
+                amountDue:$ticket->price,
+                userId: $user->id,
+                eventId: $event->id,
+                ticketId: $ticket->id,
+                emergencyData: $emergencyData,
+                additionalData: ['dietaryRestrictions' => ['Nenhuma restrição alimentar']],
+                organizationName: $data['organizationName']
+            );
+
+            if(bccomp('0.00', $ticket->price) === 0) {
+                $registration = $registration->updateStatus(EventRegistrationStatus::CONFIRMED);
+                // email de confirmação
+            }
+            
+            $attemptsInsert = 0;
+
+            while($attemptsInsert < 5) {
+
+                $registration = $registration->withRegistration($this->generateRegistration($event));
+                
+                try {
+
+                    $insertedRegistration = $erepo->saveEventRegistration($registration);
+                
+                    break;
+
+                } catch(\PDOException $exception) {
+
+                    $errorCode = $exception->errorInfo[1] ?? 0;
+                    $errorMessage = $exception->getMessage();
+                    $message = null;
+
+                    if ($errorCode === 1062) {
+                        if(str_contains($errorMessage, 'idxEventRegistrationsRegistrationHash')) {
+                            $attemptsInsert++;
+                            continue;
+                        }
+                    }
+
+                    Log::error('Registro duplicado de inscricao gerado: '.$cpf, 'registrations-errors.log');
+
+                } catch(\Exception $exception) {
+
+                    Log::error('Erro ao gravar inscricao: '.$cpf, 'registrations-errors.log');
+                }
+            }
+
+            if(!isset($insertedRegistration) || is_null($insertedRegistration)) {
+                Log::error('Erro ao gravar inscricao 2: '.$cpf, 'registrations-errors.log');
+            } else {
+                $registration = $insertedRegistration;
+            }
+
+            //email confirmacao
+        }
+
+        fclose($handle);
+
+        echo "Sucesso";exit;
+
+        return Response::empty();
+    }
+
+    private function generateRegistration(Event $event): string
+    {
+        return substr($event->year, -2) . '1' . $event->type->value . Auth::getRandomCode(4, true);
     }
 }

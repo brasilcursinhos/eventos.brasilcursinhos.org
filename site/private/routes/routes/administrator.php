@@ -103,4 +103,14 @@ return function(\Router\Router $router)
         'set' => '/administrador/insert-users',
         'roles' => [UserRole::ADMINSTRATOR]
     ], 'AdministratorController@insertUsers');
+
+    $router->get([
+        'set' => '/administrador/insert-registrations',
+        'roles' => [UserRole::ADMINSTRATOR]
+    ], 'AdministratorController@insertRegistrations');
+
+    $router->get([
+        'set' => '/administrador/update-users',
+        'roles' => [UserRole::ADMINSTRATOR]
+    ], 'AdministratorController@fixCpf');
 };

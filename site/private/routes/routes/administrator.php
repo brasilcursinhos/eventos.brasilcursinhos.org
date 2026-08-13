@@ -113,4 +113,9 @@ return function(\Router\Router $router)
         'set' => '/administrador/update-users',
         'roles' => [UserRole::ADMINSTRATOR]
     ], 'AdministratorController@fixCpf');
+
+    $router->get([
+        'set' => '/administrador/insert-proofs',
+        'roles' => [UserRole::ADMINSTRATOR]
+    ], 'AdministratorController@insertProofs');
 };

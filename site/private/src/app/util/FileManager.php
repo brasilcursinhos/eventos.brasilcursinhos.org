@@ -209,4 +209,83 @@ class FileManager
 
         return $content;
     }
+
+    public static function moveLocalFile(
+        string $sourcePath,  
+        bool $encrypt = false, 
+        string $encryptionAAD = '',
+        ?string $relativePath = '',
+        bool $returnContent = false
+    ): File {
+        
+        if (!file_exists($sourcePath)) {
+            throw new FileException(['read' => 'O arquivo de origem não foi encontrado no servidor.']);
+        }
+
+        $finfo = new \finfo(FILEINFO_MIME_TYPE);
+        $realMimeType = $finfo->file($sourcePath);
+        $fileSize = (int) filesize($sourcePath);
+        $originalName = basename($sourcePath);
+        
+        $relativePath = trim($relativePath, '/');
+        $absoluteDir = rtrim(DIR_PRIVATE_DOCUMENTS, '/');
+        
+        if ($relativePath !== '') {
+            $absoluteDir .= '/' . $relativePath;
+        }
+
+        if (!is_dir($absoluteDir)) {
+            if (!mkdir($absoluteDir, 0755, true)) {
+                throw new FileException(['save' => 'Falha ao criar o diretório de destino.']);
+            }
+        }
+
+        if ($encrypt) {
+            $extensionSuffix = '.enc';
+        } else {
+            $mimeTypes = new MimeTypes();
+            $extensions = $mimeTypes->getExtensions($realMimeType);
+            $extensionSuffix = !empty($extensions) ? '.' . $extensions[0] : '';
+        }
+        
+        do {
+            $storedName = bin2hex(random_bytes(24)) . $extensionSuffix;
+            $destinationPath = $absoluteDir . '/' . $storedName;
+        } while (file_exists($destinationPath));
+
+        if ($encrypt) {
+            
+            $fileContent = file_get_contents($sourcePath);
+
+            if ($fileContent === false) {
+                throw new FileException(['read' => 'Falha ao ler o conteúdo do arquivo de origem.']);
+            }
+
+            $encryptedContent = Crypto::encrypt($fileContent, $encryptionAAD, true);
+
+            if (file_put_contents($destinationPath, $encryptedContent) === false) {
+                throw new FileException(['save' => 'Falha ao salvar o arquivo criptografado no disco.']);
+            }
+
+            unlink($sourcePath);
+
+        } else {
+
+            $fileContent = ($returnContent) ? file_get_contents($sourcePath) : null;
+
+            if (!rename($sourcePath, $destinationPath)) {
+                throw new FileException(['save' => 'Falha ao mover o arquivo para o diretório de destino.']);
+            }
+        }
+
+        return new File(
+            originalName: $originalName,
+            storedName: $storedName,
+            path: $relativePath,
+            mimeType: $realMimeType,
+            size: $fileSize,
+            isEncrypted: $encrypt,
+            content: $returnContent ? $fileContent : null
+        );
+    }
 }

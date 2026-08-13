@@ -5,6 +5,8 @@ use App\Enum\Role\UserRole;
 use App\Enum\Status\EventRegistrationStatus;
 use App\Enum\Status\FinancialTransactionStatus;
 use App\Enum\Type\EventRegistrationType;
+use App\Enum\Type\PaymentMethodType;
+use App\Exception\FileException;
 use App\Model\EmergencyData;
 use App\Model\EventRegistration;
 use App\Model\PersonalData;
@@ -22,6 +24,8 @@ use Google\Type\PhoneNumber;
 use Router\Request;
 use Router\Response;
 use App\Model\Event;
+use App\Model\FinancialTransaction;
+use App\Service\PixIdExtractorService;
 
 class AdministratorController
 {
@@ -535,5 +539,106 @@ class AdministratorController
     private function generateRegistration(Event $event): string
     {
         return substr($event->year, -2) . '1' . $event->type->value . Auth::getRandomCode(4, true);
+    }
+
+    public function insertProofs(EventsRepository $erepo, AdministratorRepository $arepo): Response
+    {
+        $filePath = __DIR__ . '/files.csv';
+
+        if (!file_exists($filePath)) {
+            throw new \RuntimeException("O arquivo CSV não foi encontrado: {$filePath}");
+        }
+
+        $handle = fopen($filePath, 'r');
+        if ($handle === false) {
+            throw new \RuntimeException("Não foi possível abrir o arquivo CSV: {$filePath}");
+        }
+
+        // Lê a primeira linha (cabeçalhos)
+        $headers = fgetcsv($handle, 0, ';', '"', '\\');
+        
+        // Remove o BOM (Byte Order Mark) do primeiro cabeçalho, comum em arquivos exportados do Windows/Excel
+        if ($headers !== false) {
+            $headers[0] = preg_replace('/^[\xef\xbb\xbf]+/', '', $headers[0]);
+        }
+
+
+        // Lê as linhas subsequentes
+        while (($row = fgetcsv($handle, 0, ';', '"', '\\')) !== false) {
+            // Ignora linhas totalmente vazias
+            if (empty(array_filter($row))) {
+                continue;
+            }
+
+            // Mapeia a linha atual com as chaves do cabeçalho
+            $data = array_combine($headers, $row);
+
+            $cpf = ValidatorService::validateCpf($data['cpf']);
+            $fileName = $data['fileName'];
+            if($fileName == 'isencao') {
+                continue;
+            }
+            $sourcePath = DIR_PRIVATE_DOCUMENTS . 'proofs/' . $fileName;
+
+            if(!$cpf) {
+                Log::error('CPF inválido no id: '.$data['cpf'], 'files-errors.log');
+                continue;
+            }
+
+            $user = $arepo->getUser($cpf);
+            $event = $erepo->getEvent(1);
+
+            if(is_null($user) || is_null($event)) {
+                Log::error('Erro ao recuperar dados iniciais: '.$cpf, 'files.log');
+                continue;
+            }
+
+            $registration = $erepo->getEventRegistration($event, $user);
+
+            if(is_null($registration)) {
+                Log::error('Inscrição não existente: '.$cpf, 'files.log');
+                continue;
+            }
+
+            if($registration->status !== EventRegistrationStatus::PENDING_PAYMENT) {
+                Log::error('Comprovante já cadastrado: '.$cpf, 'files.log');
+                continue;
+            }
+
+            try {
+                $userAAD = 'USER_ID_' . $user->id;
+                $file = FileManager::moveLocalFile(
+                    sourcePath: $sourcePath,
+                    encrypt: true,
+                    encryptionAAD: $userAAD,
+                    relativePath: 'encup/2026',
+                    returnContent: true
+                );
+                $pixIdExtractor = new PixIdExtractorService();
+                $providerTransactionId = $pixIdExtractor->extractE2eId($file->content, $file->mimeType);
+                $transaction = new FinancialTransaction(
+                    id: null,
+                    status: FinancialTransactionStatus::UNDER_REVIEW,
+                    paymentMethod: PaymentMethodType::PIX,
+                    totalAmount: $registration->amountDue,
+                    userId: $user->id,
+                    eventId: $event->id,
+                    registrationId: $registration?->id,
+                    idProofTransaction: null,
+                    providerTransactionId: $providerTransactionId
+                );
+                $beneficiaries = [];
+                $beneficiaries[] = ['cpf' => $user->personalData->cpf, 'ticket-id' => $registration->ticketId];
+                $transaction = $erepo->saveFinancialTransaction($transaction, $file, $beneficiaries);
+            } catch(\Exception $exception) {
+                Log::error('Erro ao inserir arquivo: '.$cpf, 'files.log', $exception->getMessage());
+            } 
+        }
+
+        fclose($handle);
+
+        echo "Sucesso";exit;
+
+        return Response::empty();
     }
 }

@@ -98,4 +98,9 @@ return function(\Router\Router $router)
         'set' => '/administrador/encup/lote-social/save',
         'roles' => [UserRole::ADMINSTRATOR]
     ], 'AdministratorController@saveSocialRequest');
+
+    $router->get([
+        'set' => '/administrador/insert-users',
+        'roles' => [UserRole::ADMINSTRATOR]
+    ], 'AdministratorController@insertUsers');
 };

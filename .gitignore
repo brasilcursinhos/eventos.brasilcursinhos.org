@@ -26,3 +26,5 @@ site/public_html/assets/css/*
 *.mwb.bak
 database/*.png
 *.env
+/site/private/src/*.csv
+/site/private/src/**/*.csv

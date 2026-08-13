@@ -4,6 +4,8 @@ namespace App\Controller;
 use App\Enum\Role\UserRole;
 use App\Enum\Status\EventRegistrationStatus;
 use App\Enum\Status\FinancialTransactionStatus;
+use App\Model\PersonalData;
+use App\Repository\AccessRepository;
 use App\Repository\AdministratorRepository;
 use App\Repository\EventsRepository;
 use App\Repository\FileRepository;
@@ -11,6 +13,7 @@ use App\Service\EventsService;
 use App\Service\ValidatorService;
 use App\Util\Auth;
 use App\Util\FileManager;
+use App\Util\Log;
 use App\Util\Session;
 use Router\Request;
 use Router\Response;
@@ -307,4 +310,77 @@ class AdministratorController
         return Response::file($content, $file->originalName, $file->mimeType);
     }
 
+    public function insertUsers(AccessRepository $repository): Response
+    {
+        $filePath = __DIR__ . '/user-encup.csv';
+
+        if (!file_exists($filePath)) {
+            throw new \RuntimeException("O arquivo CSV não foi encontrado: {$filePath}");
+        }
+
+        $handle = fopen($filePath, 'r');
+        if ($handle === false) {
+            throw new \RuntimeException("Não foi possível abrir o arquivo CSV: {$filePath}");
+        }
+
+        // Lê a primeira linha (cabeçalhos)
+        $headers = fgetcsv($handle, 0, ';', '"', '\\');
+        
+        // Remove o BOM (Byte Order Mark) do primeiro cabeçalho, comum em arquivos exportados do Windows/Excel
+        if ($headers !== false) {
+            $headers[0] = preg_replace('/^[\xef\xbb\xbf]+/', '', $headers[0]);
+        }
+
+        $personalDataList = [];
+
+        // Lê as linhas subsequentes
+        while (($row = fgetcsv($handle, 0, ';', '"', '\\')) !== false) {
+            // Ignora linhas totalmente vazias
+            if (empty(array_filter($row))) {
+                continue;
+            }
+
+            // Mapeia a linha atual com as chaves do cabeçalho
+            $data = array_combine($headers, $row);
+
+            $cpf = ValidatorService::validateCpf($data['cpf']);
+            $email = ValidatorService::validateEmail($data['email']);
+
+            if(!$cpf || !$email) {
+                Log::error('CPF/E-mail inválido no id: '.$data['id'], 'insert-errors.log');
+                continue;
+            }
+
+            $personalDataList[] = new PersonalData(
+                fullName: ValidatorService::validatePersonalName($data['fullName']),
+                useSocialName: false,
+                nickname: ValidatorService::validatePersonalName($data['nickname']),
+                pronouns: [$data['pronouns']],
+                genderIdentity: $data['genderIdentify'],
+                ethnicity: $data['ethnicity'],
+                cpf: $data['cpf'],
+                birthDate: new \DateTimeImmutable($data['birthDate']),
+                email: $data['email'],
+                phone: $data['phone'],
+                socialName: null,
+                address: null
+            );
+        }
+
+        fclose($handle);
+
+        foreach($personalDataList as $personalData) {
+            try {
+                $repository->saveRegistrationn($personalData);
+            } catch (\Exception $exception) {
+                Log::error("Erro na inserção: ", 'inserts.log', $exception->getMessage());
+                Log::error('Insert com erro: ', 'insert-errors.log', json_encode($personalData));
+                continue;
+            }
+        }
+
+        echo "Sucesso";exit;
+
+        return Response::empty();
+    }
 }
